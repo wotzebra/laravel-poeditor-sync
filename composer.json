@@ -16,21 +16,21 @@
         }
     ],
     "require": {
-        "php": "^7.1",
-        "illuminate/support": "5.8.*"
+        "php": "^7.3",
+        "illuminate/support": "^6.0"
     },
     "require-dev": {
-        "orchestra/testbench": "3.8.*",
-        "phpunit/phpunit": "^7.0"
+        "orchestra/testbench": "^4.0",
+        "phpunit/phpunit": "^8.0"
     },
     "autoload": {
         "psr-4": {
-            "Nextapps\\LaravelPoeditorSync\\": "src"
+            "NextApps\\PoeditorSync\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Nextapps\\LaravelPoeditorSync\\Tests\\": "tests"
+            "NextApps\\PoeditorSync\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -44,10 +44,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Nextapps\\LaravelPoeditorSync\\LaravelPoeditorSyncServiceProvider"
+                "NextApps\\PoeditorSync\\LaravelPoeditorSyncServiceProvider"
             ],
             "aliases": {
-                "LaravelPoeditorSync": "Nextapps\\LaravelPoeditorSync\\LaravelPoeditorSyncFacade"
+                "LaravelPoeditorSync": "NextApps\\PoeditorSync\\LaravelPoeditorSyncFacade"
             }
         }
     }

@@ -1,10 +1,10 @@
 <?php
 
-namespace Nextapps\LaravelPoeditorSync;
+namespace NextApps\PoeditorSync;
 
 use Illuminate\Support\ServiceProvider;
 
-class LaravelPoeditorSyncServiceProvider extends ServiceProvider
+class PoeditorSyncServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap the application services.
@@ -54,7 +54,7 @@ class LaravelPoeditorSyncServiceProvider extends ServiceProvider
 
         // Register the main class to use with the facade
         $this->app->singleton('laravel-poeditor-sync', function () {
-            return new LaravelPoeditorSync;
+            return new PoeditorSync;
         });
     }
 }

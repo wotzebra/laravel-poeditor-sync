@@ -1,6 +1,6 @@
 <?php
 
-namespace Nextapps\LaravelPoeditorSync\Tests;
+namespace NextApps\PoeditorSync\Tests;
 
 use PHPUnit\Framework\TestCase;
 

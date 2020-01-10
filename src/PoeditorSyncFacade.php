@@ -1,13 +1,13 @@
 <?php
 
-namespace Nextapps\LaravelPoeditorSync;
+namespace NextApps\PoeditorSync;
 
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @see \Nextapps\LaravelPoeditorSync\Skeleton\SkeletonClass
+ * @see \NextApps\PoeditorSync\Skeleton\SkeletonClass
  */
-class LaravelPoeditorSyncFacade extends Facade
+class PoeditorSyncFacade extends Facade
 {
     /**
      * Get the registered name of the component.
