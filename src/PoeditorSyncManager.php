@@ -5,27 +5,11 @@ namespace NextApps\PoeditorSync;
 use GuzzleHttp\Client;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use NextApps\PoeditorSync\Poeditor\Poeditor;
 use Symfony\Component\VarExporter\VarExporter;
 
 class PoeditorSyncManager
 {
-    /**
-     * @var \GuzzleHttp\Client
-     */
-    protected $client;
-
-    /**
-     * Create a new manager instance.
-     *
-     * @param \GuzzleHttp\Client $client
-     *
-     * @return void
-     */
-    public function __construct(Client $client)
-    {
-        $this->client = $client;
-    }
-
     /**
      * Download and save translations in all languages.
      *
@@ -36,7 +20,7 @@ class PoeditorSyncManager
         $this->createLocaleFolders();
 
         $this->getLocales()->each(function ($locale) {
-            $translations = $this->downloadTranslations($locale);
+            $translations = app(Poeditor::class)->getTranslations($locale);
 
             $this->createPhpTranslationFiles($translations, $locale);
             $this->createJsonTranslationFile($translations, $locale);
@@ -93,39 +77,7 @@ class PoeditorSyncManager
         );
     }
 
-    /**
-     * Get translations of project in the language.
-     *
-     * @param string $locale
-     *
-     * @return array
-     */
-    protected function downloadTranslations(string $locale)
-    {
-        $projectResponse = $this->client
-            ->post(
-                'https://api.poeditor.com/v2/projects/export',
-                [
-                    'form_params' => [
-                        'api_token' => $this->getApiKey(),
-                        'id' => $this->getProjectId(),
-                        'language' => $locale,
-                        'type' => 'key_value_json',
-                    ],
-                ]
-            )
-            ->getBody()
-            ->getContents();
 
-        $exportUrl = json_decode($projectResponse, true)['result']['url'];
-
-        $exportResponse = $this->client
-            ->get($exportUrl)
-            ->getBody()
-            ->getContents();
-
-        return json_decode($exportResponse, true);
-    }
 
     /**
      * Create folders for all project locales in "lang" resources folder.
@@ -156,26 +108,6 @@ class PoeditorSyncManager
      */
     protected function getLocales()
     {
-        return collect(config('poeditor-sync.locales'));
-    }
-
-    /**
-     * Get project id.
-     *
-     * @return string
-     */
-    protected function getProjectId()
-    {
-        return config('poeditor-sync.project_id');
-    }
-
-    /**
-     * Get api key.
-     *
-     * @return string
-     */
-    protected function getApiKey()
-    {
-        return config('poeditor-sync.api_key');
+        return collect(config('poeditor-sync.languages'));
     }
 }
