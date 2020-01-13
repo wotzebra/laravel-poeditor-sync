@@ -2,7 +2,20 @@
 
 namespace NextApps\PoeditorSync;
 
-class PoeditorSync
+use Illuminate\Support\Facades\Facade;
+
+/**
+ * @see \NextApps\PoeditorSync\PoeditorSyncManager
+ */
+class PoeditorSync extends Facade
 {
-    // Build your next great package.
+    /**
+     * Get the registered name of the component.
+     *
+     * @return string
+     */
+    protected static function getFacadeAccessor()
+    {
+        return 'poeditor-sync';
+    }
 }

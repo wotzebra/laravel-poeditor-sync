@@ -3,7 +3,8 @@
     "description": "Upload and download POEditor translations",
     "keywords": [
         "nextapps",
-        "laravel-poeditor-sync"
+        "laravel",
+        "poeditor"
     ],
     "homepage": "https://github.com/nextapps/laravel-poeditor-sync",
     "license": "MIT",
@@ -17,7 +18,9 @@
     ],
     "require": {
         "php": "^7.3",
-        "illuminate/support": "^6.0"
+        "guzzlehttp/guzzle": "^6.5",
+        "illuminate/support": "^6.0",
+        "symfony/var-exporter": "^5.0"
     },
     "require-dev": {
         "orchestra/testbench": "^4.0",
@@ -44,10 +47,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "NextApps\\PoeditorSync\\LaravelPoeditorSyncServiceProvider"
+                "NextApps\\PoeditorSync\\PoeditorSyncServiceProvider"
             ],
             "aliases": {
-                "LaravelPoeditorSync": "NextApps\\PoeditorSync\\LaravelPoeditorSyncFacade"
+                "PoeditorSync": "NextApps\\PoeditorSync\\PoeditorSync"
             }
         }
     }

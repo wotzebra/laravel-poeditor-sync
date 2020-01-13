@@ -2,7 +2,9 @@
 
 namespace NextApps\PoeditorSync;
 
+use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
+use NextApps\PoeditorSync\Commands\DownloadCommand;
 
 class PoeditorSyncServiceProvider extends ServiceProvider
 {
@@ -11,36 +13,14 @@ class PoeditorSyncServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        /*
-         * Optional methods to load your package assets
-         */
-        // $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'laravel-poeditor-sync');
-        // $this->loadViewsFrom(__DIR__.'/../resources/views', 'laravel-poeditor-sync');
-        // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-        // $this->loadRoutesFrom(__DIR__.'/routes.php');
-
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../config/config.php' => config_path('laravel-poeditor-sync.php'),
+                __DIR__.'/../config/poeditor-sync.php' => config_path('poeditor-sync.php'),
             ], 'config');
 
-            // Publishing the views.
-            /*$this->publishes([
-                __DIR__.'/../resources/views' => resource_path('views/vendor/laravel-poeditor-sync'),
-            ], 'views');*/
-
-            // Publishing assets.
-            /*$this->publishes([
-                __DIR__.'/../resources/assets' => public_path('vendor/laravel-poeditor-sync'),
-            ], 'assets');*/
-
-            // Publishing the translation files.
-            /*$this->publishes([
-                __DIR__.'/../resources/lang' => resource_path('lang/vendor/laravel-poeditor-sync'),
-            ], 'lang');*/
-
-            // Registering package commands.
-            // $this->commands([]);
+            $this->commands([
+                DownloadCommand::class,
+            ]);
         }
     }
 
@@ -49,12 +29,10 @@ class PoeditorSyncServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // Automatically apply the package configuration
-        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'laravel-poeditor-sync');
+        $this->mergeConfigFrom(__DIR__.'/../config/poeditor-sync.php', 'poeditor-sync');
 
-        // Register the main class to use with the facade
-        $this->app->singleton('laravel-poeditor-sync', function () {
-            return new PoeditorSync;
+        $this->app->singleton('poeditor-sync', function () {
+            return new PoeditorSyncManager(new Client());
         });
     }
 }
