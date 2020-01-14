@@ -60,7 +60,10 @@ class TranslationManager
 
         $this->createPhpTranslationFiles($translations, $locale);
         $this->createJsonTranslationFile($translations, $locale);
-        $this->createVendorTranslationFiles($translations, $locale);
+
+        if (config('poeditor-sync.include_vendor')) {
+            $this->createVendorTranslationFiles($translations, $locale);
+        }
     }
 
     /**
@@ -79,12 +82,10 @@ class TranslationManager
         $directories = collect($this->filesystem->directories(resource_path('lang/vendor')));
 
         $translations = $directories->mapWithKeys(function ($directory) use ($locale) {
-            $packageName = basename($directory);
-
             $phpTranslations = $this->getPhpTranslations("$directory/{$locale}");
             $jsonTranslations = $this->getJsonTranslations("$directory/{$locale}.json");
 
-            return [$packageName => array_merge($phpTranslations, $jsonTranslations)];
+            return [basename($directory) => array_merge($phpTranslations, $jsonTranslations)];
         })->toArray();
 
         return ['vendor' => $translations];
@@ -134,10 +135,6 @@ class TranslationManager
      */
     protected function createPhpTranslationFiles(array $translations, string $locale)
     {
-        $translations = Arr::where($translations, function ($translation, $key) {
-            return ! is_string($translation) && $key !== 'vendor';
-        });
-
         $this->createPhpFiles(resource_path("lang/{$locale}"), $translations);
     }
 
@@ -151,10 +148,6 @@ class TranslationManager
      */
     protected function createJsonTranslationFile(array $translations, string $locale)
     {
-        $translations = Arr::where($translations, function ($translation) {
-            return is_string($translation);
-        });
-
         $this->createJsonFile(resource_path("lang/{$locale}.json"), $translations);
     }
 
@@ -173,29 +166,16 @@ class TranslationManager
         }
 
         foreach ($translations['vendor'] as $package => $packageTranslations) {
-            if (! $this->filesystem->exists(resource_path("lang/vendor/{$package}/{$locale}"))) {
-                $this->filesystem->makeDirectory(resource_path("lang/vendor/{$package}/{$locale}"), 0755, true);
+            $path = resource_path("lang/vendor/{$package}/{$locale}");
+
+            if (! $this->filesystem->exists($path)) {
+                $this->filesystem->makeDirectory($path, 0755, true);
             } else {
-                $this->filesystem->cleanDirectory(resource_path("lang/vendor/{$package}/{$locale}"));
+                $this->filesystem->cleanDirectory($path);
             }
 
-            $jsonTranslations = Arr::where($packageTranslations, function ($translation) {
-                return is_string($translation);
-            });
-
-            $phpTranslations = Arr::where($packageTranslations, function ($translation) {
-                return is_array($translation);
-            });
-
-            $this->createPhpFiles(
-                resource_path("lang/vendor/{$package}/{$locale}"),
-                $phpTranslations
-            );
-
-            $this->createJsonFile(
-                resource_path("lang/vendor/{$package}/{$locale}.json"),
-                $jsonTranslations
-            );
+            $this->createPhpFiles($path, $packageTranslations);
+            $this->createJsonFile("{$path}.json", $packageTranslations);
         }
     }
 
@@ -209,6 +189,10 @@ class TranslationManager
      */
     protected function createPhpFiles(string $folder, array $translations)
     {
+        $translations = Arr::where($translations, function ($translation) {
+            return is_array($translation);
+        });
+
         foreach ($translations as $filename => $fileTranslations) {
             $array = VarExporter::export($fileTranslations);
 
@@ -229,6 +213,10 @@ class TranslationManager
      */
     protected function createJsonFile(string $filename, array $translations)
     {
+        $translations = Arr::where($translations, function ($translation) {
+            return is_string($translation);
+        });
+
         $this->filesystem->put($filename, json_encode($translations, JSON_PRETTY_PRINT));
     }
 
