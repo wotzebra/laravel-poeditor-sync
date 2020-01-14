@@ -30,7 +30,7 @@ class DownloadCommand extends Command
     public function handle()
     {
         $this->getLocales()->each(function ($locale) {
-            $translations = app(Poeditor::class)->getTranslations($locale);
+            $translations = app(Poeditor::class)->download($locale);
 
             app(TranslationManager::class)->createTranslationFiles($translations, $locale);
         });
@@ -45,6 +45,6 @@ class DownloadCommand extends Command
      */
     protected function getLocales()
     {
-        return collect(config('poeditor-sync.languages'));
+        return collect(config('poeditor-sync.locales'));
     }
 }

@@ -14,7 +14,7 @@ class UploadCommand extends Command
      * @var string
      */
     protected $signature = 'poeditor:upload
-                            {locale : The language to upload translations from}
+                            {locale? : The language to upload translations from}
                             {--force : Overwrite the existing POEditor translations}';
 
     /**
@@ -33,13 +33,18 @@ class UploadCommand extends Command
     {
         $translations = app(TranslationManager::class)->getTranslations($this->getLocale());
 
-        app(Poeditor::class)->setTranslations(
+        $response = app(Poeditor::class)->upload(
             $this->getLocale(),
             $translations,
             $this->hasOption('force') && $this->option('force')
         );
 
-        $this->info('All translations have been uploaded!');
+        $this->info('All translations have been uploaded:');
+
+        $this->line("{$response->getAddedTermsCount()} terms added");
+        $this->line("{$response->getDeletedTermsCount()} terms deleted");
+        $this->line("{$response->getAddedTranslationsCount()} translations added");
+        $this->line("{$response->getUpdatedTranslationsCount()} translations updated");
     }
 
     /**
@@ -49,6 +54,6 @@ class UploadCommand extends Command
      */
     protected function getLocale()
     {
-        return $this->argument('locale');
+        return $this->argument('locale') ?? app()->getLocale();
     }
 }

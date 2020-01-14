@@ -19,6 +19,7 @@
     "require": {
         "php": "^7.3",
         "guzzlehttp/guzzle": "^6.5",
+        "illuminate/filesystem": "^6.0",
         "illuminate/support": "^6.0",
         "symfony/var-exporter": "^5.0"
     },

@@ -38,13 +38,13 @@ class Poeditor
     }
 
     /**
-     * Get translations in the language.
+     * Download translations in the language.
      *
      * @param string $language
      *
      * @return array
      */
-    public function getTranslations(string $language)
+    public function download(string $language)
     {
         $projectResponse = $this->client
             ->post(
@@ -72,55 +72,60 @@ class Poeditor
     }
 
     /**
-     * Set translations in the language.
+     * Upload translations in the language.
      *
      * @param string $language
      * @param array $translations
      * @param bool $overwrite
      *
-     * @return void
+     * @return \NextApps\PoeditorSync\Poeditor\UploadResponse
      */
-    public function setTranslations(string $language, array $translations, bool $overwrite = false)
+    public function upload(string $language, array $translations, bool $overwrite = false)
     {
         $filename = stream_get_meta_data($file = tmpfile())['uri'] . '.json';
 
         file_put_contents($filename, json_encode($translations));
 
-        $this->client->post(
-            'https://api.poeditor.com/v2/projects/upload',
-            [
-                'multipart' => [
-                    [
-                        'name' => 'api_token',
-                        'contents' => $this->apiKey,
+        $response = $this->client
+            ->post(
+                'https://api.poeditor.com/v2/projects/upload',
+                [
+                    'multipart' => [
+                        [
+                            'name' => 'api_token',
+                            'contents' => $this->apiKey,
+                        ],
+                        [
+                            'name' => 'id',
+                            'contents' => $this->projectId,
+                        ],
+                        [
+                            'name' => 'language',
+                            'contents' => $language,
+                        ],
+                        [
+                            'name' => 'updating',
+                            'contents' => 'terms_translations',
+                        ],
+                        [
+                            'name' => 'file',
+                            'contents' => fopen($filename, 'r+'),
+                            'filename' => 'translations.json',
+                        ],
+                        [
+                            'name' => 'overwrite',
+                            'contents' => (int) $overwrite,
+                        ],
+                        [
+                            'name' => 'fuzzy_trigger',
+                            'contents' => 1,
+                        ],
                     ],
-                    [
-                        'name' => 'id',
-                        'contents' => $this->projectId,
-                    ],
-                    [
-                        'name' => 'language',
-                        'contents' => $language,
-                    ],
-                    [
-                        'name' => 'updating',
-                        'contents' => 'terms_translations',
-                    ],
-                    [
-                        'name' => 'file',
-                        'contents' => fopen($filename, 'r+'),
-                        'filename' => 'translations.json',
-                    ],
-                    [
-                        'name' => 'overwrite',
-                        'contents' => (int) $overwrite,
-                    ],
-                    [
-                        'name' => 'fuzzy_trigger',
-                        'contents' => 1,
-                    ],
-                ],
-            ]
-        );
+                ]
+            )
+            ->getBody()
+            ->getContents();
+
+        return new UploadResponse(json_decode($response, true));
     }
 }

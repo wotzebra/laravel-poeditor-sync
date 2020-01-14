@@ -3,12 +3,30 @@
 namespace NextApps\PoeditorSync\Translations;
 
 use Illuminate\Support\Arr;
+use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\VarExporter\VarExporter;
 
 class TranslationManager
 {
     /**
-     * Get translations of PHP and JSON translation files in the specified language.
+     * @var \Illuminate\Filesystem\Filesystem
+     */
+    protected $filesystem;
+
+    /**
+     * Create a new manager instance.
+     *
+     * @param \Illuminate\Filesystem\Filesystem $filesystem
+     *
+     * @return void
+     */
+    public function __construct(Filesystem $filesystem)
+    {
+        $this->filesystem = $filesystem;
+    }
+
+    /**
+     * Get translations of PHP and JSON translation files in the specified locale.
      *
      * @param string $locale
      *
@@ -32,12 +50,14 @@ class TranslationManager
      */
     public function createTranslationFiles(array $translations, string $locale)
     {
+        $this->createEmptyLocaleFolder($locale);
+
         $this->createPhpTranslationFiles($translations, $locale);
         $this->createJsonTranslationFile($translations, $locale);
     }
 
     /**
-     * Get translations of PHP translation files in the specified language.
+     * Get translations of PHP translation files in the specified locale.
      *
      * @param string $locale
      *
@@ -45,22 +65,17 @@ class TranslationManager
      */
     protected function getPhpTranslations(string $locale)
     {
-        $filenames = array_diff(
-            scandir(resource_path("lang/{$locale}")),
-            ['.', '..']
-        );
-
-        return collect($filenames)
-            ->mapWithKeys(function ($filename) use ($locale) {
+        return collect($this->filesystem->files(resource_path("lang/{$locale}")))
+            ->mapWithKeys(function ($file) {
                 return [
-                    pathinfo($filename, PATHINFO_FILENAME) => require resource_path("lang/{$locale}/{$filename}"),
+                    pathinfo($file->path, PATHINFO_FILENAME) => $this->filesystem->getRequire($file->path),
                 ];
             })
             ->toArray();
     }
 
     /**
-     * Get translations of JSON translation files in the specified language.
+     * Get translations of JSON translation files in the specified locale.
      *
      * @param string $locale
      *
@@ -70,11 +85,11 @@ class TranslationManager
     {
         $filename = resource_path("lang/{$locale}.json");
 
-        if (! file_exists($filename)) {
+        if (! $this->filesystem->exists($filename)) {
             return [];
         }
 
-        return json_decode(file_get_contents($filename), true);
+        return json_decode($this->filesystem->get($filename), true);
     }
 
     /**
@@ -87,8 +102,6 @@ class TranslationManager
      */
     protected function createPhpTranslationFiles(array $translations, string $locale)
     {
-        $this->createLocaleFolder($locale);
-
         foreach ($translations as $key => $translation) {
             if (is_string($translation)) {
                 continue;
@@ -96,7 +109,7 @@ class TranslationManager
 
             $array = VarExporter::export($translation);
 
-            file_put_contents(
+            $this->filesystem->put(
                 resource_path("lang/{$locale}/{$key}.php"),
                 '<?php' . PHP_EOL . PHP_EOL . "return {$array};",
             );
@@ -113,8 +126,6 @@ class TranslationManager
      */
     protected function createJsonTranslationFile(array $translations, string $locale)
     {
-        $this->createLocaleFolder($locale);
-
         $json = Arr::where($translations, function ($translation) {
             return is_string($translation);
         });
@@ -123,31 +134,31 @@ class TranslationManager
             return;
         }
 
-        file_put_contents(
+        $this->filesystem->put(
             resource_path("lang/{$locale}.json"),
             json_encode($json, JSON_PRETTY_PRINT)
         );
     }
 
     /**
-     * Create folder for locale in "lang" resources folder (if folder does not exist yet).
+     * Create empty folder for locale in "lang" resources folder (if folder does not exist yet).
      *
      * @param string $locale
      *
      * @return void
      */
-    protected function createLocaleFolder(string $locale)
+    protected function createEmptyLocaleFolder(string $locale)
     {
-        if (! file_exists(resource_path('lang'))) {
-            mkdir(resource_path('lang'));
+        if (! $this->filesystem->exists(resource_path('lang'))) {
+            $this->filesystem->makeDirectory(resource_path('lang'));
         }
 
         $path = resource_path("lang/{$locale}/");
 
         if (file_exists($path)) {
-            return;
+            $this->filesystem->deleteDirectory($path);
         }
 
-        mkdir($path);
+        $this->filesystem->makeDirectory($path);
     }
 }
