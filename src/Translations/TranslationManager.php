@@ -34,10 +34,16 @@ class TranslationManager
      */
     public function getTranslations(string $locale)
     {
-        return array_merge(
-            $this->getPhpTranslations($locale),
-            $this->getJsonTranslations($locale)
+        $translations = array_merge(
+            $this->getPhpTranslations(resource_path("lang/{$locale}")),
+            $this->getJsonTranslations(resource_path("lang/{$locale}.json")),
         );
+
+        if (config('poeditor-sync.include_vendor')) {
+            $translations += $this->getVendorTranslations($locale);
+        }
+
+        return $translations;
     }
 
     /**
@@ -54,37 +60,63 @@ class TranslationManager
 
         $this->createPhpTranslationFiles($translations, $locale);
         $this->createJsonTranslationFile($translations, $locale);
+        $this->createVendorTranslationFiles($translations, $locale);
     }
 
     /**
-     * Get translations of PHP translation files in the specified locale.
+     * Get translations of vendor translation files in the specified locale.
      *
      * @param string $locale
      *
      * @return array
      */
-    protected function getPhpTranslations(string $locale)
+    protected function getVendorTranslations(string $locale)
     {
-        return collect($this->filesystem->files(resource_path("lang/{$locale}")))
-            ->mapWithKeys(function ($file) {
-                return [
-                    pathinfo($file->path, PATHINFO_FILENAME) => $this->filesystem->getRequire($file->path),
-                ];
-            })
-            ->toArray();
+        if (! $this->filesystem->exists(resource_path('lang/vendor'))) {
+            return [];
+        }
+
+        $directories = collect($this->filesystem->directories(resource_path('lang/vendor')));
+
+        $translations = $directories->mapWithKeys(function ($directory) use ($locale) {
+            $packageName = basename($directory);
+
+            $phpTranslations = $this->getPhpTranslations("$directory/{$locale}");
+            $jsonTranslations = $this->getJsonTranslations("$directory/{$locale}.json");
+
+            return [$packageName => array_merge($phpTranslations, $jsonTranslations)];
+        })->toArray();
+
+        return ['vendor' => $translations];
     }
 
     /**
-     * Get translations of JSON translation files in the specified locale.
+     * Get PHP translations from files in folder.
      *
-     * @param string $locale
+     * @param string $folder
      *
      * @return array
      */
-    protected function getJsonTranslations(string $locale)
+    protected function getPhpTranslations(string $folder)
     {
-        $filename = resource_path("lang/{$locale}.json");
+        $files = collect($this->filesystem->files($folder));
 
+        return $files->mapWithKeys(function ($file) {
+            $filename = pathinfo($file->getRealPath(), PATHINFO_FILENAME);
+
+            return [$filename => $this->filesystem->getRequire($file->getRealPath())];
+        })->toArray();
+    }
+
+    /**
+     * Get JSON translations from file.
+     *
+     * @param string $filename
+     *
+     * @return array
+     */
+    protected function getJsonTranslations(string $filename)
+    {
         if (! $this->filesystem->exists($filename)) {
             return [];
         }
@@ -102,18 +134,11 @@ class TranslationManager
      */
     protected function createPhpTranslationFiles(array $translations, string $locale)
     {
-        foreach ($translations as $key => $translation) {
-            if (is_string($translation)) {
-                continue;
-            }
+        $translations = Arr::where($translations, function ($translation, $key) {
+            return ! is_string($translation) && $key !== 'vendor';
+        });
 
-            $array = VarExporter::export($translation);
-
-            $this->filesystem->put(
-                resource_path("lang/{$locale}/{$key}.php"),
-                '<?php' . PHP_EOL . PHP_EOL . "return {$array};",
-            );
-        }
+        $this->createPhpFiles(resource_path("lang/{$locale}"), $translations);
     }
 
     /**
@@ -126,18 +151,85 @@ class TranslationManager
      */
     protected function createJsonTranslationFile(array $translations, string $locale)
     {
-        $json = Arr::where($translations, function ($translation) {
+        $translations = Arr::where($translations, function ($translation) {
             return is_string($translation);
         });
 
-        if (empty($json)) {
+        $this->createJsonFile(resource_path("lang/{$locale}.json"), $translations);
+    }
+
+    /**
+     * Create vendor translation files.
+     *
+     * @param array $translations
+     * @param string $locale
+     *
+     * @return void
+     */
+    protected function createVendorTranslationFiles(array $translations, string $locale)
+    {
+        if (! Arr::has($translations, 'vendor')) {
             return;
         }
 
-        $this->filesystem->put(
-            resource_path("lang/{$locale}.json"),
-            json_encode($json, JSON_PRETTY_PRINT)
-        );
+        foreach ($translations['vendor'] as $package => $packageTranslations) {
+            if (! $this->filesystem->exists(resource_path("lang/vendor/{$package}/{$locale}"))) {
+                $this->filesystem->makeDirectory(resource_path("lang/vendor/{$package}/{$locale}"), 0755, true);
+            } else {
+                $this->filesystem->cleanDirectory(resource_path("lang/vendor/{$package}/{$locale}"));
+            }
+
+            $jsonTranslations = Arr::where($packageTranslations, function ($translation) {
+                return is_string($translation);
+            });
+
+            $phpTranslations = Arr::where($packageTranslations, function ($translation) {
+                return is_array($translation);
+            });
+
+            $this->createPhpFiles(
+                resource_path("lang/vendor/{$package}/{$locale}"),
+                $phpTranslations
+            );
+
+            $this->createJsonFile(
+                resource_path("lang/vendor/{$package}/{$locale}.json"),
+                $jsonTranslations
+            );
+        }
+    }
+
+    /**
+     * Create PHP translation files in folder.
+     *
+     * @param string $filename
+     * @param array $translations
+     *
+     * @return void
+     */
+    protected function createPhpFiles(string $folder, array $translations)
+    {
+        foreach ($translations as $filename => $fileTranslations) {
+            $array = VarExporter::export($fileTranslations);
+
+            $this->filesystem->put(
+                "{$folder}/{$filename}.php",
+                '<?php' . PHP_EOL . PHP_EOL . "return {$array};" . PHP_EOL,
+            );
+        }
+    }
+
+    /**
+     * Create JSON translation file on filename.
+     *
+     * @param string $filename
+     * @param array $translations
+     *
+     * @return void
+     */
+    protected function createJsonFile(string $filename, array $translations)
+    {
+        $this->filesystem->put($filename, json_encode($translations, JSON_PRETTY_PRINT));
     }
 
     /**
