@@ -1,11 +1,15 @@
-# Very short description of the package
+# Laravel Poeditor Synchronization
+
+> WORK IN PROGRESS!
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/nextapps/laravel-poeditor-sync.svg?style=flat-square)](https://packagist.org/packages/nextapps/laravel-poeditor-sync)
 [![Build Status](https://img.shields.io/travis/nextapps/laravel-poeditor-sync/master.svg?style=flat-square)](https://travis-ci.org/nextapps/laravel-poeditor-sync)
 [![Quality Score](https://img.shields.io/scrutinizer/g/nextapps/laravel-poeditor-sync.svg?style=flat-square)](https://scrutinizer-ci.com/g/nextapps/laravel-poeditor-sync)
 [![Total Downloads](https://img.shields.io/packagist/dt/nextapps/laravel-poeditor-sync.svg?style=flat-square)](https://packagist.org/packages/nextapps/laravel-poeditor-sync)
 
-This is where your description should go. Try and limit it to a paragraph or two, and maybe throw in a mention of what PSRs you support to avoid any confusion with users and contributors.
+Upload and download POEditor translations.
+Both PHP and JSON translation files are supported.
+Vendor PHP / JSON translations can also be uploaded / downloaded.
 
 ## Installation
 
@@ -15,10 +19,53 @@ You can install the package via composer:
 composer require nextapps/laravel-poeditor-sync
 ```
 
+You can publish the configuration file:
+
+```bash
+php artisan vendor:publish --provider="NextApps\PoeditorSync\PoeditorSyncServiceProvider"
+```
+
+Set the POEditor API key and Project ID in your env-file:
+```
+POEDITOR_API_KEY=<your api key>
+POEDITOR_PROJECT_ID=<your project id>
+```
+
+In the 'poeditor-sync' configuration file, you should specify the supported locales:
+
+```php
+// in config/poeditor-sync.php
+
+return [
+    // ...
+    'locales' => ['en', 'nl', 'fr'],
+    // ...
+]
+```
+
 ## Usage
 
-``` php
-// Usage description here
+### Configuration
+
+
+### Download translations
+
+``` bash
+// Download translations in all locales
+php artisan poeditor:download
+```
+
+### Upload Translations
+
+``` bash
+// Upload translations of default app locale
+php artisan poeditor:upload
+
+// Upload translations of specified locale
+php artisan poeditor:upload nl
+
+// Upload translations and overwrite existing POEditor translations
+php artisan poeditor:upload --force
 ```
 
 ### Testing
@@ -35,10 +82,6 @@ Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recen
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-### Security
-
-If you discover any security related issues, please email gunther@nextapps.be instead of using the issue tracker.
-
 ## Credits
 
 - [Günther Debrauwer](https://github.com/nextapps)
@@ -47,7 +90,3 @@ If you discover any security related issues, please email gunther@nextapps.be in
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
-
-## Laravel Package Boilerplate
-
-This package was generated using the [Laravel Package Boilerplate](https://laravelpackageboilerplate.com).
