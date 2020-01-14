@@ -48,10 +48,7 @@
         "laravel": {
             "providers": [
                 "NextApps\\PoeditorSync\\PoeditorSyncServiceProvider"
-            ],
-            "aliases": {
-                "PoeditorSync": "NextApps\\PoeditorSync\\PoeditorSync"
-            }
+            ]
         }
     }
 }

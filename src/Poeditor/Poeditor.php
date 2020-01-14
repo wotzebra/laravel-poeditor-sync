@@ -70,4 +70,57 @@ class Poeditor
 
         return json_decode($exportResponse, true);
     }
+
+    /**
+     * Set translations in the language.
+     *
+     * @param string $language
+     * @param array $translations
+     * @param bool $overwrite
+     *
+     * @return void
+     */
+    public function setTranslations(string $language, array $translations, bool $overwrite = false)
+    {
+        $filename = stream_get_meta_data($file = tmpfile())['uri'] . '.json';
+
+        file_put_contents($filename, json_encode($translations));
+
+        $this->client->post(
+            'https://api.poeditor.com/v2/projects/upload',
+            [
+                'multipart' => [
+                    [
+                        'name' => 'api_token',
+                        'contents' => $this->apiKey,
+                    ],
+                    [
+                        'name' => 'id',
+                        'contents' => $this->projectId,
+                    ],
+                    [
+                        'name' => 'language',
+                        'contents' => $language,
+                    ],
+                    [
+                        'name' => 'updating',
+                        'contents' => 'terms_translations',
+                    ],
+                    [
+                        'name' => 'file',
+                        'contents' => fopen($filename, 'r+'),
+                        'filename' => 'translations.json',
+                    ],
+                    [
+                        'name' => 'overwrite',
+                        'contents' => (int) $overwrite,
+                    ],
+                    [
+                        'name' => 'fuzzy_trigger',
+                        'contents' => 1,
+                    ],
+                ],
+            ]
+        );
+    }
 }

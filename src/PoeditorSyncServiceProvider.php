@@ -4,8 +4,9 @@ namespace NextApps\PoeditorSync;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
-use NextApps\PoeditorSync\Commands\DownloadCommand;
 use NextApps\PoeditorSync\Poeditor\Poeditor;
+use NextApps\PoeditorSync\Commands\UploadCommand;
+use NextApps\PoeditorSync\Commands\DownloadCommand;
 
 class PoeditorSyncServiceProvider extends ServiceProvider
 {
@@ -21,6 +22,7 @@ class PoeditorSyncServiceProvider extends ServiceProvider
 
             $this->commands([
                 DownloadCommand::class,
+                UploadCommand::class,
             ]);
         }
     }
@@ -31,10 +33,6 @@ class PoeditorSyncServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(__DIR__.'/../config/poeditor-sync.php', 'poeditor-sync');
-
-        $this->app->singleton('poeditor-sync', function () {
-            return new PoeditorSyncManager();
-        });
 
         $this->app->bind(Poeditor::class, function () {
             return new Poeditor(

@@ -3,7 +3,8 @@
 namespace NextApps\PoeditorSync\Commands;
 
 use Illuminate\Console\Command;
-use NextApps\PoeditorSync\PoeditorSync;
+use NextApps\PoeditorSync\Poeditor\Poeditor;
+use NextApps\PoeditorSync\Translations\TranslationManager;
 
 class DownloadCommand extends Command
 {
@@ -19,7 +20,7 @@ class DownloadCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Download translations from poeditor';
+    protected $description = 'Download translations from POEditor';
 
     /**
      * Execute the console command.
@@ -28,8 +29,22 @@ class DownloadCommand extends Command
      */
     public function handle()
     {
-        PoeditorSync::download();
+        $this->getLocales()->each(function ($locale) {
+            $translations = app(Poeditor::class)->getTranslations($locale);
+
+            app(TranslationManager::class)->createTranslationFiles($translations, $locale);
+        });
 
         $this->info('All translations have been downloaded!');
+    }
+
+    /**
+     * Get project locales.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getLocales()
+    {
+        return collect(config('poeditor-sync.languages'));
     }
 }
