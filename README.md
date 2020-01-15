@@ -45,9 +45,6 @@ return [
 
 ## Usage
 
-### Configuration
-
-
 ### Download translations
 
 ``` bash
