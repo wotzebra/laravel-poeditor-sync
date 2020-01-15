@@ -4,9 +4,9 @@ namespace NextApps\PoeditorSync;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
-use NextApps\PoeditorSync\Poeditor\Poeditor;
-use NextApps\PoeditorSync\Commands\UploadCommand;
 use NextApps\PoeditorSync\Commands\DownloadCommand;
+use NextApps\PoeditorSync\Commands\UploadCommand;
+use NextApps\PoeditorSync\Poeditor\Poeditor;
 
 class PoeditorSyncServiceProvider extends ServiceProvider
 {

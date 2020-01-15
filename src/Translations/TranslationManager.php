@@ -2,8 +2,8 @@
 
 namespace NextApps\PoeditorSync\Translations;
 
-use Illuminate\Support\Arr;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
 use Symfony\Component\VarExporter\VarExporter;
 
 class TranslationManager
@@ -198,7 +198,7 @@ class TranslationManager
 
             $this->filesystem->put(
                 "{$folder}/{$filename}.php",
-                '<?php' . PHP_EOL . PHP_EOL . "return {$array};" . PHP_EOL,
+                '<?php'.PHP_EOL.PHP_EOL."return {$array};".PHP_EOL,
             );
         }
     }
