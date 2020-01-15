@@ -19,9 +19,6 @@ class DownloadCommandTest extends TestCase
 
         app(Filesystem::class)->cleanDirectory(resource_path('lang'));
         app(Filesystem::class)->makeDirectory(resource_path('lang/en'));
-
-        config()->set('poeditor-sync.locales', ['en']);
-        config()->set('poeditor-sync.include_vendor', true);
     }
 
     /** @test */
@@ -29,31 +26,25 @@ class DownloadCommandTest extends TestCase
     {
         config()->set('poeditor-sync.locales', ['en', 'nl']);
 
-        $this->mock(Poeditor::class, function ($mock) {
-            $mock->shouldReceive('download')
-                ->with('en')
-                ->andReturn([
-                    'first-en-php-file' => [
-                        'foo' => 'bar',
-                    ],
-                    'second-en-php-file' => [
-                        'foo_bar' => 'bar foo',
-                    ],
-                ]);
+        $this->mockPoeditorDownload('en', [
+            'first-en-php-file' => [
+                'foo' => 'bar',
+            ],
+            'second-en-php-file' => [
+                'foo_bar' => 'bar foo',
+            ],
+        ]);
 
-            $mock->shouldReceive('download')
-                ->with('nl')
-                ->andReturn([
-                    'first-nl-php-file' => [
-                        'bar_foo' => 'foo bar',
-                    ],
-                    'second-nl-php-file' => [
-                        'bar' => 'foo',
-                    ],
-                ]);
-        });
+        $this->mockPoeditorDownload('nl', [
+            'first-nl-php-file' => [
+                'bar_foo' => 'foo bar',
+            ],
+            'second-nl-php-file' => [
+                'bar' => 'foo',
+            ],
+        ]);
 
-        $this->artisan('poeditor:download');
+        $this->artisan('poeditor:download')->assertExitCode(0);
 
         $this->assertPhpTranslationFile(resource_path('lang/en/first-en-php-file.php'), ['foo' => 'bar']);
         $this->assertPhpTranslationFile(resource_path('lang/en/second-en-php-file.php'), ['foo_bar' => 'bar foo']);
@@ -66,23 +57,17 @@ class DownloadCommandTest extends TestCase
     {
         config()->set('poeditor-sync.locales', ['en', 'nl']);
 
-        $this->mock(Poeditor::class, function ($mock) {
-            $mock->shouldReceive('download')
-                ->with('en')
-                ->andReturn([
-                    'first-en-json-key' => 'bar',
-                    'second-en-json-key' => 'bar foo',
-                ]);
+        $this->mockPoeditorDownload('en', [
+            'first-en-json-key' => 'bar',
+            'second-en-json-key' => 'bar foo',
+        ]);
 
-            $mock->shouldReceive('download')
-                ->with('nl')
-                ->andReturn([
-                    'first-nl-json-key' => 'foo bar',
-                    'second-nl-json-key' => 'foo',
-                ]);
-        });
+        $this->mockPoeditorDownload('nl', [
+            'first-nl-json-key' => 'foo bar',
+            'second-nl-json-key' => 'foo',
+        ]);
 
-        $this->artisan('poeditor:download');
+        $this->artisan('poeditor:download')->assertExitCode(0);
 
         $this->assertJsonTranslationFile(resource_path('lang/en.json'), [
             'first-en-json-key' => 'bar',
@@ -99,51 +84,45 @@ class DownloadCommandTest extends TestCase
     {
         config()->set('poeditor-sync.locales', ['en', 'nl']);
 
-        $this->mock(Poeditor::class, function ($mock) {
-            $mock->shouldReceive('download')
-                ->with('en')
-                ->andReturn([
-                    'vendor' => [
-                        'first-package' => [
-                            'first-package-en-php-file' => [
-                                'foo' => 'bar',
-                            ],
-                            'first-package-first-en-json-key' => 'bar foo',
-                            'first-package-second-en-json-key' => 'foo bar',
-                        ],
-                        'second-package' => [
-                            'second-package-en-php-file' => [
-                                'bar' => 'foo',
-                            ],
-                            'second-package-first-en-json-key' => 'bar foo bar',
-                            'second-package-second-en-json-key' => 'foo bar foo',
-                        ],
+        $this->mockPoeditorDownload('en', [
+            'vendor' => [
+                'first-package' => [
+                    'first-package-en-php-file' => [
+                        'foo' => 'bar',
                     ],
-                ]);
-
-            $mock->shouldReceive('download')
-                ->with('nl')
-                ->andReturn([
-                    'vendor' => [
-                        'first-package' => [
-                            'first-package-nl-php-file' => [
-                                'bar' => 'foo',
-                            ],
-                            'first-package-first-nl-json-key' => 'foo bar',
-                            'first-package-second-nl-json-key' => 'bar foo',
-                        ],
-                        'second-package' => [
-                            'second-package-nl-php-file' => [
-                                'foo' => 'bar',
-                            ],
-                            'second-package-first-nl-json-key' => 'foo bar foo',
-                            'second-package-second-nl-json-key' => 'bar foo bar',
-                        ],
+                    'first-package-first-en-json-key' => 'bar foo',
+                    'first-package-second-en-json-key' => 'foo bar',
+                ],
+                'second-package' => [
+                    'second-package-en-php-file' => [
+                        'bar' => 'foo',
                     ],
-                ]);
-        });
+                    'second-package-first-en-json-key' => 'bar foo bar',
+                    'second-package-second-en-json-key' => 'foo bar foo',
+                ],
+            ],
+        ]);
 
-        $this->artisan('poeditor:download');
+        $this->mockPoeditorDownload('nl', [
+            'vendor' => [
+                'first-package' => [
+                    'first-package-nl-php-file' => [
+                        'bar' => 'foo',
+                    ],
+                    'first-package-first-nl-json-key' => 'foo bar',
+                    'first-package-second-nl-json-key' => 'bar foo',
+                ],
+                'second-package' => [
+                    'second-package-nl-php-file' => [
+                        'foo' => 'bar',
+                    ],
+                    'second-package-first-nl-json-key' => 'foo bar foo',
+                    'second-package-second-nl-json-key' => 'bar foo bar',
+                ],
+            ],
+        ]);
+
+        $this->artisan('poeditor:download')->assertExitCode(0);
 
         $this->assertPhpTranslationFile(
             resource_path('lang/vendor/first-package/en/first-package-en-php-file.php'),
@@ -183,26 +162,22 @@ class DownloadCommandTest extends TestCase
     /** @test */
     public function it_saves_php_and_json_and_vendor_translations_of_locale()
     {
-        $this->mock(Poeditor::class, function ($mock) {
-            $mock->shouldReceive('download')
-                ->with('en')
-                ->andReturn([
-                    'php-file' => [
-                        'foo' => 'bar',
+        $this->mockPoeditorDownload('en', [
+            'php-file' => [
+                'foo' => 'bar',
+            ],
+            'json-key' => 'bar foo',
+            'vendor' => [
+                'package-name' => [
+                    'package-php-file' => [
+                        'bar' => 'foo',
                     ],
-                    'json-key' => 'bar foo',
-                    'vendor' => [
-                        'package-name' => [
-                            'package-php-file' => [
-                                'bar' => 'foo',
-                            ],
-                            'package-json-key' => 'foo bar foo',
-                        ],
-                    ]
-                ]);
-        });
+                    'package-json-key' => 'foo bar foo',
+                ],
+            ]
+        ]);
 
-        $this->artisan('poeditor:download');
+        $this->artisan('poeditor:download')->assertExitCode(0);
 
         $this->assertPhpTranslationFile(resource_path('lang/en/php-file.php'), ['foo' => 'bar']);
         $this->assertJsonTranslationFile(resource_path('lang/en.json'), ['json-key' => 'bar foo']);
@@ -215,17 +190,13 @@ class DownloadCommandTest extends TestCase
     {
         file_put_contents(resource_path('lang/en/old-php-file.php'), ['foo' => 'bar']);
 
-        $this->mock(Poeditor::class, function ($mock) {
-            $mock->shouldReceive('download')
-                ->with('en')
-                ->andReturn([
-                    'new-php-file' => [
-                        'bar' => 'foo',
-                    ],
-                ]);
-        });
+        $this->mockPoeditorDownload('en', [
+            'new-php-file' => [
+                'bar' => 'foo',
+            ],
+        ]);
 
-        $this->artisan('poeditor:download');
+        $this->artisan('poeditor:download')->assertExitCode(0);
 
         $this->assertFalse(file_exists(resource_path('lang/en/old-php-file.php')));
         $this->assertTrue(file_exists(resource_path('lang/en/new-php-file.php')));
@@ -236,15 +207,9 @@ class DownloadCommandTest extends TestCase
     {
         file_put_contents(resource_path('lang/en.json'), json_encode(['foo' => 'bar'], JSON_PRETTY_PRINT));
 
-        $this->mock(Poeditor::class, function ($mock) {
-            $mock->shouldReceive('download')
-                ->with('en')
-                ->andReturn([
-                    'bar' => 'foo',
-                ]);
-        });
+        $this->mockPoeditorDownload('en', ['bar' => 'foo']);
 
-        $this->artisan('poeditor:download');
+        $this->artisan('poeditor:download')->assertExitCode(0);
 
         $this->assertJsonTranslationFile(resource_path('lang/en.json'), ['bar' => 'foo']);
     }
@@ -256,21 +221,17 @@ class DownloadCommandTest extends TestCase
 
         file_put_contents(resource_path('lang/vendor/package-name/en/old-php-file.php'), ['foo' => 'bar']);
 
-        $this->mock(Poeditor::class, function ($mock) {
-            $mock->shouldReceive('download')
-                ->with('en')
-                ->andReturn([
-                    'vendor' => [
-                        'package-name' => [
-                            'new-php-file' => [
-                                'bar' => 'foo',
-                            ],
-                        ],
-                    ]
-                ]);
-        });
+        $this->mockPoeditorDownload('en', [
+            'vendor' => [
+                'package-name' => [
+                    'new-php-file' => [
+                        'bar' => 'foo',
+                    ],
+                ],
+            ]
+        ]);
 
-        $this->artisan('poeditor:download');
+        $this->artisan('poeditor:download')->assertExitCode(0);
 
         $this->assertFalse(file_exists(resource_path('lang/vendor/package-name/en/old-php-file.php')));
         $this->assertTrue(file_exists(resource_path('lang/vendor/package-name/en/new-php-file.php')));
@@ -283,19 +244,15 @@ class DownloadCommandTest extends TestCase
 
         file_put_contents(resource_path('lang/vendor/package-name/en.json'), json_encode(['foo' => 'bar'], JSON_PRETTY_PRINT));
 
-        $this->mock(Poeditor::class, function ($mock) {
-            $mock->shouldReceive('download')
-                ->with('en')
-                ->andReturn([
-                    'vendor' => [
-                        'package-name' => [
-                            'bar' => 'foo',
-                        ],
-                    ]
-                ]);
-        });
+        $this->mockPoeditorDownload('en', [
+            'vendor' => [
+                'package-name' => [
+                    'bar' => 'foo',
+                ],
+            ]
+        ]);
 
-        $this->artisan('poeditor:download');
+        $this->artisan('poeditor:download')->assertExitCode(0);
 
         $this->assertJsonTranslationFile(resource_path('lang/vendor/package-name/en.json'), ['bar' => 'foo']);
     }
@@ -305,25 +262,53 @@ class DownloadCommandTest extends TestCase
     {
         config()->set('poeditor-sync.include_vendor', false);
 
-        $this->mock(Poeditor::class, function ($mock) {
-            $mock->shouldReceive('download')
-                ->with('en')
-                ->andReturn([
-                    'vendor' => [
-                        'package-name' => [
-                            'php-file' => [
-                                'bar' => 'foo',
-                            ],
-                            'json-key' => 'foo bar foo',
-                        ],
+        $this->mockPoeditorDownload('en', [
+            'php-file' => [
+                'bar' => 'foo',
+            ],
+            'json-key' => 'bar foo bar',
+            'vendor' => [
+                'package-name' => [
+                    'php-file' => [
+                        'bar' => 'foo',
                     ],
-                ]);
-        });
+                    'json-key' => 'foo bar foo',
+                ],
+            ],
+        ]);
 
-        $this->artisan('poeditor:download');
+        $this->artisan('poeditor:download')->assertExitCode(0);
 
         $this->assertFalse(file_exists(resource_path('lang/vendor/package-name/en/php-file.php')));
         $this->assertFalse(file_exists(resource_path('lang/vendor/package-name/en.json')));
+
+        $this->assertTrue(file_exists(resource_path('lang/en/php-file.php')));
+        $this->assertTrue(file_exists(resource_path('lang/en.json')));
+    }
+
+    /**
+     * Mock the POEditor "download" method.
+     *
+     * @param string $language
+     * @param array $data
+     *
+     * @return void
+     */
+    public function mockPoeditorDownload(string $language, array $data)
+    {
+        if (get_class(app(Poeditor::class)) !== Poeditor::class) {
+            app(Poeditor::class)->shouldReceive('download')
+                ->with($language)
+                ->andReturn($data);
+
+            return;
+        }
+
+        $this->mock(Poeditor::class, function ($mock) use ($language, $data) {
+            $mock->shouldReceive('download')
+                ->with($language)
+                ->andReturn($data);
+        });
     }
 
     /**
