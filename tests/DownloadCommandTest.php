@@ -13,7 +13,7 @@ class DownloadCommandTest extends TestCase
      *
      * @return void
      */
-    protected function setUp() : void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -71,11 +71,11 @@ class DownloadCommandTest extends TestCase
 
         $this->assertJsonTranslationFile(resource_path('lang/en.json'), [
             'first-en-json-key' => 'bar',
-            'second-en-json-key' => 'bar foo'
+            'second-en-json-key' => 'bar foo',
         ]);
         $this->assertJsonTranslationFile(resource_path('lang/nl.json'), [
             'first-nl-json-key' => 'foo bar',
-            'second-nl-json-key' => 'foo'
+            'second-nl-json-key' => 'foo',
         ]);
     }
 
@@ -174,7 +174,7 @@ class DownloadCommandTest extends TestCase
                     ],
                     'package-json-key' => 'foo bar foo',
                 ],
-            ]
+            ],
         ]);
 
         $this->artisan('poeditor:download')->assertExitCode(0);
@@ -228,7 +228,7 @@ class DownloadCommandTest extends TestCase
                         'bar' => 'foo',
                     ],
                 ],
-            ]
+            ],
         ]);
 
         $this->artisan('poeditor:download')->assertExitCode(0);
@@ -249,7 +249,7 @@ class DownloadCommandTest extends TestCase
                 'package-name' => [
                     'bar' => 'foo',
                 ],
-            ]
+            ],
         ]);
 
         $this->artisan('poeditor:download')->assertExitCode(0);
@@ -323,7 +323,7 @@ class DownloadCommandTest extends TestCase
     {
         $this->assertTrue(file_exists($filename));
         $this->assertEquals(
-            '<?php' . PHP_EOL . PHP_EOL . 'return ' . VarExporter::export($data) . ';' . PHP_EOL,
+            '<?php'.PHP_EOL.PHP_EOL.'return '.VarExporter::export($data).';'.PHP_EOL,
             file_get_contents($filename)
         );
     }

@@ -14,7 +14,7 @@ class UploadCommandTest extends TestCase
      *
      * @return void
      */
-    protected function setUp() : void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -154,7 +154,7 @@ class UploadCommandTest extends TestCase
         $this->mockPoeditorUpload('en', [], false, $response = $this->getUploadResponse());
 
         $this->artisan('poeditor:upload')
-            ->expectsOutput("All translations have been uploaded:")
+            ->expectsOutput('All translations have been uploaded:')
             ->expectsOutput("{$response->getAddedTermsCount()} terms added")
             ->expectsOutput("{$response->getDeletedTermsCount()} terms deleted")
             ->expectsOutput("{$response->getAddedTranslationsCount()} translations added")
@@ -227,7 +227,7 @@ class UploadCommandTest extends TestCase
 
         file_put_contents(
             $filename,
-            '<?php' . PHP_EOL . PHP_EOL . 'return ' . VarExporter::export($data) . ';' . PHP_EOL
+            '<?php'.PHP_EOL.PHP_EOL.'return '.VarExporter::export($data).';'.PHP_EOL
         );
     }
 

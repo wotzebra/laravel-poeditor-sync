@@ -2,10 +2,10 @@
 
 namespace NextApps\PoeditorSync\Tests;
 
-use Illuminate\Support\Str;
 use Illuminate\Foundation\Testing\WithFaker;
-use Orchestra\Testbench\TestCase as BaseTestCase;
+use Illuminate\Support\Str;
 use NextApps\PoeditorSync\PoeditorSyncServiceProvider;
+use Orchestra\Testbench\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
 {
@@ -16,7 +16,7 @@ class TestCase extends BaseTestCase
      *
      * @return void
      */
-    protected function setUp() : void
+    protected function setUp(): void
     {
         parent::setUp();
 
