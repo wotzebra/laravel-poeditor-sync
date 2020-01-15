@@ -36,7 +36,7 @@ class PoeditorSyncServiceProvider extends ServiceProvider
 
         $this->app->bind(Poeditor::class, function () {
             return new Poeditor(
-                new Client(),
+                app(Client::class),
                 config('poeditor-sync.api_key'),
                 config('poeditor-sync.project_id')
             );
