@@ -24,7 +24,7 @@
         "symfony/var-exporter": "^5.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^4.1",
+        "orchestra/testbench": "^4.6",
         "phpunit/phpunit": "^8.5"
     },
     "autoload": {
