@@ -1,7 +1,5 @@
 # Laravel Poeditor Synchronization
 
-> WORK IN PROGRESS!
-
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/nextapps-be/laravel-poeditor-sync.svg?style=flat-square)](https://packagist.org/packages/nextapps-be/laravel-poeditor-sync)
 [![Build Status](https://img.shields.io/travis/nextapps-be/laravel-poeditor-sync/master.svg?style=flat-square)](https://travis-ci.org/nextapps-be/laravel-poeditor-sync)
 [![Quality Score](https://img.shields.io/scrutinizer/g/nextapps-be/laravel-poeditor-sync.svg?style=flat-square)](https://scrutinizer-ci.com/g/nextapps-be/laravel-poeditor-sync)
