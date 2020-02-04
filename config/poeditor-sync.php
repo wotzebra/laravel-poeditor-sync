@@ -28,7 +28,11 @@ return [
     | Locales
     |--------------------------------------------------------------------------
     |
-    | The list of locales that are used in Laravel project.
+    | The list of locales that are used in Laravel project. If you provide an
+    | associative array, the keys of the array are the POEditor locales,
+    | while the values are the locales used in this Laravel project.
+    |
+    | Example: ['en', 'nl'] OR ['en-gb' => 'en', 'nl-be' => 'nl']
     |
     */
     'locales' => ['en'],

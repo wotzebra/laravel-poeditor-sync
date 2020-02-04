@@ -192,6 +192,50 @@ class UploadCommandTest extends TestCase
         $this->artisan('poeditor:upload')->assertExitCode(0);
     }
 
+    /** @test */
+    public function it_maps_internal_locale_on_poeditor_locale()
+    {
+        config()->set('poeditor-sync.locales', ['en-gb' => 'en']);
+
+        $this->createPhpTranslationFile(resource_path('lang/en/en-php-file.php'), ['bar' => 'foo']);
+        $this->createJsonTranslationFile(resource_path('lang/en.json'), ['foo_bar' => 'bar foo']);
+
+        $this->mockPoeditorUpload('en-gb', [
+            'en-php-file' => [
+                'bar' => 'foo',
+            ],
+            'foo_bar' => 'bar foo',
+        ]);
+
+        $this->artisan('poeditor:upload en')->assertExitCode(0);
+    }
+
+    /** @test */
+    public function it_throws_error_if_provided_locale_is_not_present_in_config_locales_array()
+    {
+        config()->set('poeditor-sync.locales', ['en', 'nl']);
+
+        $this->mockPoeditorUpload('fr', []);
+
+        $this->artisan('poeditor:upload fr')
+            ->assertExitCode(1)
+            ->expectsOutput('Invalid locale provided!');
+    }
+
+    /** @test */
+    public function it_throws_error_if_default_locale_is_not_present_in_config_locales_array()
+    {
+        app()->setLocale('fr');
+
+        config()->set('poeditor-sync.locales', ['en', 'nl']);
+
+        $this->mockPoeditorUpload('fr', []);
+
+        $this->artisan('poeditor:upload')
+            ->assertExitCode(1)
+            ->expectsOutput('Invalid locale provided!');
+    }
+
     /**
      * Mock the POEditor "upload" method.
      *
