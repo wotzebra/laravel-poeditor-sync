@@ -31,37 +31,46 @@ POEDITOR_API_KEY=<your api key>
 POEDITOR_PROJECT_ID=<your project id>
 ```
 
-In the 'poeditor-sync' configuration file, you should specify the supported locales:
+In the 'poeditor-sync' configuration file, you should specify the supported locales.
+You can also provide an associate array, if you want to map POEditor locales to internal locales.
 
 ```php
 // in config/poeditor-sync.php
 
-return [
-    // ...
-    'locales' => ['en', 'nl', 'fr'],
-    // ...
-]
+// Provide array with all supported locales ...
+'locales' => ['en', 'nl', 'fr'],
+
+// ... Or provide associative array with POEditor locales mapped to internal locales
+'locales' => ['en-gb' => 'en', 'nl-be' => 'nl'],
 ```
 
 ## Usage
 
 ### Download translations
 
+All translations in all supported locales will be downloaded.
+
 ``` bash
-// Download translations in all locales
 php artisan poeditor:download
 ```
 
 ### Upload Translations
 
+Upload translations of the default app locale:
+
 ``` bash
-// Upload translations of default app locale
 php artisan poeditor:upload
+```
 
-// Upload translations of specified locale
+Upload translations of specified locale:
+
+```bash
 php artisan poeditor:upload nl
+````
 
-// Upload translations and overwrite existing POEditor translations
+Upload translations and overwrite existing POEditor translations:
+
+```bash
 php artisan poeditor:upload --force
 ```
 
