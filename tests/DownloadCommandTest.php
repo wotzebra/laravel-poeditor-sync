@@ -310,7 +310,7 @@ class DownloadCommandTest extends TestCase
         $this->assertPhpTranslationFile(resource_path('lang/en/en-php-file.php'), ['foo' => 'bar']);
         $this->assertJsonTranslationFile(resource_path('lang/en.json'), ['foo bar' => 'bar foo']);
         $this->assertPhpTranslationFile(resource_path('lang/nl/nl-php-file.php'), ['bar' => 'foo']);
-        $this->assertJsonTranslationFile(resource_path('lang/nl.json'), ['bar foo' => 'foo bar',]);
+        $this->assertJsonTranslationFile(resource_path('lang/nl.json'), ['bar foo' => 'foo bar']);
     }
 
     /**
