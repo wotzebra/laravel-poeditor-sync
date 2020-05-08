@@ -19,12 +19,12 @@
     "require": {
         "php": "^7.3",
         "guzzlehttp/guzzle": "^6.5",
-        "illuminate/filesystem": "^6.0",
-        "illuminate/support": "^6.0",
+        "illuminate/filesystem": "^6.0|^7.0",
+        "illuminate/support": "^6.0|^7.0",
         "symfony/var-exporter": "^5.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^4.6",
+        "orchestra/testbench": "^4.6|^5.0",
         "phpunit/phpunit": "^8.5"
     },
     "autoload": {
@@ -40,7 +40,6 @@
     "scripts": {
         "test": "vendor/bin/phpunit",
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
-
     },
     "config": {
         "sort-packages": true
