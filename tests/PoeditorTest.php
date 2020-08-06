@@ -3,10 +3,11 @@
 namespace NextApps\PoeditorSync\Tests;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
+use InvalidArgumentException;
+use GuzzleHttp\Handler\MockHandler;
 use NextApps\PoeditorSync\Poeditor\Poeditor;
 use NextApps\PoeditorSync\Poeditor\UploadResponse;
 
@@ -80,6 +81,17 @@ class PoeditorTest extends TestCase
         $this->assertEquals(parse_url($url, PHP_URL_HOST), $downloadExportRequest->getUri()->getHost());
         $this->assertEquals(parse_url($url, PHP_URL_PATH), $downloadExportRequest->getUri()->getPath());
     }
+
+    /** @test */
+    public function it_throws_an_error_if_config_values_are_empty()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        config()->set('poeditor-sync.api_key', '');
+        config()->set('poeditor-sync.project_id', '');
+
+        app(Poeditor::class)->download($this->faker->locale);
+    }
+
 
     /** @test */
     public function it_uploads_translations()
