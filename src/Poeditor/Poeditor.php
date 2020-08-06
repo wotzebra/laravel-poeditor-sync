@@ -33,14 +33,13 @@ class Poeditor
      */
     public function __construct(Client $client, string $apiKey, string $projectId)
     {
-        if (!is_string($apiKey) || !$apiKey) {
+        if (! is_string($apiKey) || ! $apiKey) {
             throw new InvalidArgumentException('Invalid API key');
         }
 
-        if (!is_string($projectId) || !$projectId) {
+        if (! is_string($projectId) || ! $projectId) {
             throw new InvalidArgumentException('Invalid project id');
         }
-
 
         $this->client = $client;
         $this->apiKey = $apiKey;

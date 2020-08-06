@@ -3,11 +3,11 @@
 namespace NextApps\PoeditorSync\Tests;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Middleware;
+use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 use InvalidArgumentException;
-use GuzzleHttp\Handler\MockHandler;
 use NextApps\PoeditorSync\Poeditor\Poeditor;
 use NextApps\PoeditorSync\Poeditor\UploadResponse;
 
@@ -91,7 +91,6 @@ class PoeditorTest extends TestCase
 
         app(Poeditor::class)->download($this->faker->locale);
     }
-
 
     /** @test */
     public function it_uploads_translations()
