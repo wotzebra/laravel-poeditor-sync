@@ -193,6 +193,29 @@ class UploadCommandTest extends TestCase
     }
 
     /** @test */
+    public function it_does_not_upload_translation_files_that_have_been_excluded_in_config()
+    {
+        config()->set('poeditor-sync.excluded_files', [
+            'auth'
+        ]);
+
+        $this->createPhpTranslationFile(resource_path('lang/en/php-file.php'), ['bar' => 'foo']);
+        $this->createJsonTranslationFile(resource_path('lang/en.json'), ['foo_bar' => 'bar foo']);
+
+        $this->createPhpTranslationFile(resource_path('lang/en/auth.php'), ['bar' => 'foo']);
+
+
+        $this->mockPoeditorUpload('en', [
+            'php-file' => [
+                'bar' => 'foo',
+            ],
+            'foo_bar' => 'bar foo',
+        ]);
+
+        $this->artisan('poeditor:upload')->assertExitCode(0);
+    }
+
+    /** @test */
     public function it_maps_internal_locale_on_poeditor_locale()
     {
         config()->set('poeditor-sync.locales', ['en-gb' => 'en']);

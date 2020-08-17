@@ -48,4 +48,16 @@ return [
     |
     */
     'include_vendor' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Exclude files
+    |--------------------------------------------------------------------------
+    |
+    | You may not always want to upload all your translation files.
+    | Define the files that should be skipped here.
+    |
+    */
+    'excluded_files' => [
+    ]
 ];

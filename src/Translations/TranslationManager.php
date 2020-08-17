@@ -102,7 +102,12 @@ class TranslationManager
     {
         $files = collect($this->filesystem->files($folder));
 
-        return $files->mapWithKeys(function ($file) {
+        return $files->reject(function($file){
+            return collect(config('poeditor-sync.excluded_files'))
+                    ->contains(function($excluded_file) use($file){
+                    return $excluded_file.'.php' == $file->getFilename();
+            });
+        })->mapWithKeys(function ($file) {
             $filename = pathinfo($file->getRealPath(), PATHINFO_FILENAME);
 
             return [$filename => $this->filesystem->getRequire($file->getRealPath())];
