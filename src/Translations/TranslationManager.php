@@ -148,6 +148,10 @@ class TranslationManager
      */
     protected function createJsonTranslationFile(array $translations, string $locale)
     {
+        if (empty($translations)) {
+            return;
+        }
+
         $this->createJsonFile(resource_path("lang/{$locale}.json"), $translations);
     }
 
