@@ -148,10 +148,6 @@ class TranslationManager
      */
     protected function createJsonTranslationFile(array $translations, string $locale)
     {
-        if (empty($translations)) {
-            return;
-        }
-
         $this->createJsonFile(resource_path("lang/{$locale}.json"), $translations);
     }
 
@@ -220,6 +216,10 @@ class TranslationManager
         $translations = Arr::where($translations, function ($translation) {
             return is_string($translation);
         });
+
+        if (empty($translations)) {
+            return;
+        }
 
         $this->filesystem->put($filename, json_encode($translations, JSON_PRETTY_PRINT));
     }

@@ -287,6 +287,21 @@ class DownloadCommandTest extends TestCase
     }
 
     /** @test */
+    public function it_does_not_create_json_translation_file_if_no_json_translations_present()
+    {
+        $this->mockPoeditorDownload('en', [
+            'php-file' => [
+                'bar' => 'foo',
+            ],
+        ]);
+
+        $this->artisan('poeditor:download')->assertExitCode(0);
+
+        $this->assertTrue(file_exists(resource_path('lang/en/php-file.php')));
+        $this->assertFalse(file_exists(resource_path('lang/en.json')));
+    }
+
+    /** @test */
     public function it_maps_poeditor_locales_on_internal_locales()
     {
         config()->set('poeditor-sync.locales', ['en-gb' => 'en', 'nl-be' => 'nl']);
