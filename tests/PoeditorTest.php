@@ -83,10 +83,18 @@ class PoeditorTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_error_if_config_values_are_empty()
+    public function it_throws_an_error_if_api_key_is_empty()
     {
         $this->expectException(InvalidArgumentException::class);
         config()->set('poeditor-sync.api_key', '');
+
+        app(Poeditor::class)->download($this->faker->locale);
+    }
+
+    /** @test */
+    public function it_throws_an_error_if_project_id_is_empty()
+    {
+        $this->expectException(InvalidArgumentException::class);
         config()->set('poeditor-sync.project_id', '');
 
         app(Poeditor::class)->download($this->faker->locale);
