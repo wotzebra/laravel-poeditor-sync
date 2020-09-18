@@ -86,7 +86,18 @@ class PoeditorTest extends TestCase
     public function it_throws_an_error_if_api_key_is_empty()
     {
         $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid API key');
         config()->set('poeditor-sync.api_key', '');
+
+        app(Poeditor::class)->download($this->faker->locale);
+    }
+
+    /** @test */
+    public function it_throws_an_error_if_api_key_is_null()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid API key');
+        config()->set('poeditor-sync.api_key', null);
 
         app(Poeditor::class)->download($this->faker->locale);
     }
@@ -95,7 +106,18 @@ class PoeditorTest extends TestCase
     public function it_throws_an_error_if_project_id_is_empty()
     {
         $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid project id');
         config()->set('poeditor-sync.project_id', '');
+
+        app(Poeditor::class)->download($this->faker->locale);
+    }
+
+    /** @test */
+    public function it_throws_an_error_if_project_id_is_null()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid project id');
+        config()->set('poeditor-sync.project_id', null);
 
         app(Poeditor::class)->download($this->faker->locale);
     }

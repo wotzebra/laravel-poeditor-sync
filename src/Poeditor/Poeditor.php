@@ -31,7 +31,7 @@ class Poeditor
      *
      * @return void
      */
-    public function __construct(Client $client, string $apiKey, string $projectId)
+    public function __construct(Client $client, $apiKey, $projectId)
     {
         if (! is_string($apiKey) || ! $apiKey) {
             throw new InvalidArgumentException('Invalid API key');
