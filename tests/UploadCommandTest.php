@@ -197,12 +197,14 @@ class UploadCommandTest extends TestCase
     {
         config()->set('poeditor-sync.excluded_files', [
             'auth',
+            'validation.php',
         ]);
 
         $this->createPhpTranslationFile(resource_path('lang/en/php-file.php'), ['bar' => 'foo']);
         $this->createJsonTranslationFile(resource_path('lang/en.json'), ['foo_bar' => 'bar foo']);
 
         $this->createPhpTranslationFile(resource_path('lang/en/auth.php'), ['bar' => 'foo']);
+        $this->createPhpTranslationFile(resource_path('lang/en/validation.php'), ['foobar' => 'barfoo']);
 
         $this->mockPoeditorUpload('en', [
             'php-file' => [

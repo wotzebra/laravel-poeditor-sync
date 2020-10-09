@@ -4,6 +4,7 @@ namespace NextApps\PoeditorSync\Translations;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Symfony\Component\VarExporter\VarExporter;
 
 class TranslationManager
@@ -102,16 +103,24 @@ class TranslationManager
     {
         $files = collect($this->filesystem->files($folder));
 
-        return $files->reject(function ($file) {
-            return collect(config('poeditor-sync.excluded_files'))
-                    ->contains(function ($excluded_file) use ($file) {
-                        return $excluded_file.'.php' == $file->getFilename();
-                    });
-        })->mapWithKeys(function ($file) {
-            $filename = pathinfo($file->getRealPath(), PATHINFO_FILENAME);
+        $excludedFiles = collect(config('poeditor-sync.excluded_files'))
+            ->map(function ($excludedFile) {
+                if (Str::endsWith($excludedFile, '.php')) {
+                    return $excludedFile;
+                }
 
-            return [$filename => $this->filesystem->getRequire($file->getRealPath())];
-        })->toArray();
+                return "{$excludedFile}.php";
+            });
+
+        return $files
+            ->reject(function ($file) use ($excludedFiles) {
+                return $excludedFiles->contains($file->getFilename());
+            })->mapWithKeys(function ($file) {
+                $filename = pathinfo($file->getRealPath(), PATHINFO_FILENAME);
+
+                return [$filename => $this->filesystem->getRequire($file->getRealPath())];
+            })
+            ->toArray();
     }
 
     /**
