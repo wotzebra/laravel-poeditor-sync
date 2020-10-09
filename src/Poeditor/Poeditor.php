@@ -3,6 +3,7 @@
 namespace NextApps\PoeditorSync\Poeditor;
 
 use GuzzleHttp\Client;
+use InvalidArgumentException;
 
 class Poeditor
 {
@@ -30,8 +31,16 @@ class Poeditor
      *
      * @return void
      */
-    public function __construct(Client $client, string $apiKey, string $projectId)
+    public function __construct(Client $client, $apiKey, $projectId)
     {
+        if (! is_string($apiKey) || ! $apiKey) {
+            throw new InvalidArgumentException('Invalid API key');
+        }
+
+        if (! is_string($projectId) || ! $projectId) {
+            throw new InvalidArgumentException('Invalid project id');
+        }
+
         $this->client = $client;
         $this->apiKey = $apiKey;
         $this->projectId = $projectId;

@@ -7,6 +7,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
+use InvalidArgumentException;
 use NextApps\PoeditorSync\Poeditor\Poeditor;
 use NextApps\PoeditorSync\Poeditor\UploadResponse;
 
@@ -79,6 +80,46 @@ class PoeditorTest extends TestCase
         $this->assertEquals('GET', $downloadExportRequest->getMethod());
         $this->assertEquals(parse_url($url, PHP_URL_HOST), $downloadExportRequest->getUri()->getHost());
         $this->assertEquals(parse_url($url, PHP_URL_PATH), $downloadExportRequest->getUri()->getPath());
+    }
+
+    /** @test */
+    public function it_throws_an_error_if_api_key_is_empty()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid API key');
+        config()->set('poeditor-sync.api_key', '');
+
+        app(Poeditor::class)->download($this->faker->locale);
+    }
+
+    /** @test */
+    public function it_throws_an_error_if_api_key_is_null()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid API key');
+        config()->set('poeditor-sync.api_key', null);
+
+        app(Poeditor::class)->download($this->faker->locale);
+    }
+
+    /** @test */
+    public function it_throws_an_error_if_project_id_is_empty()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid project id');
+        config()->set('poeditor-sync.project_id', '');
+
+        app(Poeditor::class)->download($this->faker->locale);
+    }
+
+    /** @test */
+    public function it_throws_an_error_if_project_id_is_null()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid project id');
+        config()->set('poeditor-sync.project_id', null);
+
+        app(Poeditor::class)->download($this->faker->locale);
     }
 
     /** @test */
