@@ -103,7 +103,7 @@ class TranslationManager
     {
         $files = collect($this->filesystem->files($folder));
 
-        $excludedFiles = collect(config('poeditor-sync.excluded_files'))
+        $excludedFiles = collect(config('poeditor-sync.excluded_files', []))
             ->map(function ($excludedFile) {
                 if (Str::endsWith($excludedFile, '.php')) {
                     return $excludedFile;
