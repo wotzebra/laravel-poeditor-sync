@@ -7,7 +7,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | The POEditor API key that will be used to authenticate the requests to
-    | the API to upload and download translations.
+    | the POEditor API to upload and download your project's translations.
     |
     */
     'api_key' => env('POEDITOR_API_KEY'),
@@ -17,8 +17,7 @@ return [
     | Project ID
     |--------------------------------------------------------------------------
     |
-    | The ID of the POEditor project that is associated with this Laravel
-    | project.
+    | The ID of the POEditor project that is associated with this project.
     |
     */
     'project_id' => env('POEDITOR_PROJECT_ID'),
@@ -43,8 +42,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Vendor translations should not always be uploaded / downloaded. This
-    | option allows you to enable or disable the inclusion of vendor
-    | translations.
+    | option allows you to toggle the inclusion of vendor translations.
     |
     */
     'include_vendor' => true,
@@ -54,10 +52,9 @@ return [
     | Exclude files
     |--------------------------------------------------------------------------
     |
-    | You may not always want to upload all your translation files.
-    | Define the files that should be skipped here.
+    | You may not always want to upload all your translation files. Here you
+    | can define the files that should be skipped during upload process.
     |
     */
-    'excluded_files' => [
-    ],
+    'excluded_files' => [],
 ];
