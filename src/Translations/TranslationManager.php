@@ -217,6 +217,10 @@ class TranslationManager
             return is_string($translation);
         });
 
+        if (empty($translations)) {
+            return;
+        }
+
         $this->filesystem->put($filename, json_encode($translations, JSON_PRETTY_PRINT));
     }
 
