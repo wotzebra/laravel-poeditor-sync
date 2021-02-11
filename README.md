@@ -1,8 +1,8 @@
 # Laravel Poeditor Synchronization
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/nextapps/laravel-poeditor-sync.svg?style=flat-square)](https://packagist.org/packages/nextapps/laravel-poeditor-sync)
-[![Build Status](https://img.shields.io/travis/nextapps-be/laravel-poeditor-sync/master.svg?style=flat-square)](https://travis-ci.org/nextapps-be/laravel-poeditor-sync)
-[![Quality Score](https://img.shields.io/scrutinizer/g/nextapps-be/laravel-poeditor-sync.svg?style=flat-square)](https://scrutinizer-ci.com/g/nextapps-be/laravel-poeditor-sync)
+[![GitHub 'Run Tests' Workflow Status](https://img.shields.io/github/workflow/status/gdebrauwer/laravel-hateoas/run-tests?label=tests&style=flat-square&logo=github)]
+(https://github.com/gdebrauwer/laravel-hateoas/actions?query=workflow%3Arun-tests)
 [![Total Downloads](https://img.shields.io/packagist/dt/nextapps/laravel-poeditor-sync.svg?style=flat-square)](https://packagist.org/packages/nextapps/laravel-poeditor-sync)
 
 Upload and download POEditor translations.
@@ -76,6 +76,12 @@ php artisan poeditor:upload --force
 
 ``` bash
 composer test
+```
+
+## Linting
+
+```bash
+composer lint
 ```
 
 ### Changelog
