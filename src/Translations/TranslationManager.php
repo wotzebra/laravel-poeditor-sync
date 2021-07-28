@@ -210,10 +210,11 @@ class TranslationManager
         foreach ($translations as $filename => $fileTranslations) {
             $array = VarExporter::export($fileTranslations);
 
-            $this->filesystem->put(
-                "{$folder}/{$filename}.php",
-                '<?php'.PHP_EOL.PHP_EOL."return {$array};".PHP_EOL,
-            );
+            if ($filename != 'vendor')
+                $this->filesystem->put(
+                    "{$folder}/{$filename}.php",
+                    '<?php'.PHP_EOL.PHP_EOL."return {$array};".PHP_EOL,
+                );
         }
     }
 
