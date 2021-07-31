@@ -124,6 +124,9 @@ class DownloadCommandTest extends TestCase
 
         $this->artisan('poeditor:download')->assertExitCode(0);
 
+        $this->assertFalse(file_exists(resource_path('lang/en/vendor.php')));
+        $this->assertFalse(file_exists(resource_path('lang/nl/vendor.php')));
+
         $this->assertPhpTranslationFile(
             resource_path('lang/vendor/first-package/en/first-package-en-php-file.php'),
             ['foo' => 'bar']
@@ -178,6 +181,8 @@ class DownloadCommandTest extends TestCase
         ]);
 
         $this->artisan('poeditor:download')->assertExitCode(0);
+
+        $this->assertFalse(file_exists(resource_path('lang/en/vendor.php')));
 
         $this->assertPhpTranslationFile(resource_path('lang/en/php-file.php'), ['foo' => 'bar']);
         $this->assertJsonTranslationFile(resource_path('lang/en.json'), ['json-key' => 'bar foo']);
@@ -281,6 +286,7 @@ class DownloadCommandTest extends TestCase
 
         $this->assertFalse(file_exists(resource_path('lang/vendor/package-name/en/php-file.php')));
         $this->assertFalse(file_exists(resource_path('lang/vendor/package-name/en.json')));
+        $this->assertFalse(file_exists(resource_path('lang/en/vendor.php')));
 
         $this->assertTrue(file_exists(resource_path('lang/en/php-file.php')));
         $this->assertTrue(file_exists(resource_path('lang/en.json')));
