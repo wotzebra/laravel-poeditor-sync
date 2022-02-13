@@ -91,7 +91,7 @@ class Poeditor
      */
     public function upload(string $language, array $translations, bool $overwrite = false)
     {
-        $filename = stream_get_meta_data($file = tmpfile())['uri'].'.json';
+        $filename = stream_get_meta_data($file = tmpfile())['uri'] . '.json';
 
         file_put_contents($filename, json_encode($translations));
 

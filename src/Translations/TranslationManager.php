@@ -83,8 +83,8 @@ class TranslationManager
         $directories = collect($this->filesystem->directories(lang_path('vendor')));
 
         $translations = $directories->mapWithKeys(function ($directory) use ($locale) {
-            $phpTranslations = $this->getPhpTranslations("$directory/{$locale}");
-            $jsonTranslations = $this->getJsonTranslations("$directory/{$locale}.json");
+            $phpTranslations = $this->getPhpTranslations("${directory}/{$locale}");
+            $jsonTranslations = $this->getJsonTranslations("${directory}/{$locale}.json");
 
             return [basename($directory) => array_merge($phpTranslations, $jsonTranslations)];
         })->toArray();
@@ -216,7 +216,7 @@ class TranslationManager
 
             $this->filesystem->put(
                 "{$folder}/{$filename}.php",
-                '<?php'.PHP_EOL.PHP_EOL."return {$array};".PHP_EOL,
+                '<?php' . PHP_EOL . PHP_EOL . "return {$array};" . PHP_EOL,
             );
         }
     }

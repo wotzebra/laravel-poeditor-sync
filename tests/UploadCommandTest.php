@@ -14,7 +14,7 @@ class UploadCommandTest extends TestCase
      *
      * @return void
      */
-    protected function setUp(): void
+    protected function setUp() : void
     {
         parent::setUp();
 
@@ -295,7 +295,7 @@ class UploadCommandTest extends TestCase
 
         file_put_contents(
             $filename,
-            '<?php'.PHP_EOL.PHP_EOL.'return '.VarExporter::export($data).';'.PHP_EOL
+            '<?php' . PHP_EOL . PHP_EOL . 'return ' . VarExporter::export($data) . ';' . PHP_EOL
         );
     }
 

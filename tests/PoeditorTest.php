@@ -28,7 +28,7 @@ class PoeditorTest extends TestCase
      *
      * @return void
      */
-    protected function setUp(): void
+    protected function setUp() : void
     {
         parent::setUp();
 

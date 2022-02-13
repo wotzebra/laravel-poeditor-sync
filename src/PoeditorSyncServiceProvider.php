@@ -17,7 +17,7 @@ class PoeditorSyncServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../config/poeditor-sync.php' => config_path('poeditor-sync.php'),
+                __DIR__ . '/../config/poeditor-sync.php' => config_path('poeditor-sync.php'),
             ], 'config');
 
             $this->commands([
@@ -32,7 +32,7 @@ class PoeditorSyncServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/poeditor-sync.php', 'poeditor-sync');
+        $this->mergeConfigFrom(__DIR__ . '/../config/poeditor-sync.php', 'poeditor-sync');
 
         $this->app->bind(Poeditor::class, function () {
             return new Poeditor(

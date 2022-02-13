@@ -13,7 +13,7 @@ class DownloadCommandTest extends TestCase
      *
      * @return void
      */
-    protected function setUp(): void
+    protected function setUp() : void
     {
         parent::setUp();
 
@@ -371,7 +371,7 @@ class DownloadCommandTest extends TestCase
     {
         $this->assertTrue(file_exists($filename));
         $this->assertEquals(
-            '<?php'.PHP_EOL.PHP_EOL.'return '.VarExporter::export($data).';'.PHP_EOL,
+            '<?php' . PHP_EOL . PHP_EOL . 'return ' . VarExporter::export($data) . ';' . PHP_EOL,
             file_get_contents($filename)
         );
     }
