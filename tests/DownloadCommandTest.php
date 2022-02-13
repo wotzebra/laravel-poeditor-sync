@@ -17,8 +17,8 @@ class DownloadCommandTest extends TestCase
     {
         parent::setUp();
 
-        app(Filesystem::class)->cleanDirectory(resource_path('lang'));
-        app(Filesystem::class)->makeDirectory(resource_path('lang/en'));
+        app(Filesystem::class)->cleanDirectory(lang_path());
+        app(Filesystem::class)->makeDirectory(lang_path('en'));
     }
 
     /** @test */
@@ -46,10 +46,10 @@ class DownloadCommandTest extends TestCase
 
         $this->artisan('poeditor:download')->assertExitCode(0);
 
-        $this->assertPhpTranslationFile(resource_path('lang/en/first-en-php-file.php'), ['foo' => 'bar']);
-        $this->assertPhpTranslationFile(resource_path('lang/en/second-en-php-file.php'), ['foo_bar' => 'bar foo']);
-        $this->assertPhpTranslationFile(resource_path('lang/nl/first-nl-php-file.php'), ['bar_foo' => 'foo bar']);
-        $this->assertPhpTranslationFile(resource_path('lang/nl/second-nl-php-file.php'), ['bar' => 'foo']);
+        $this->assertPhpTranslationFile(lang_path('en/first-en-php-file.php'), ['foo' => 'bar']);
+        $this->assertPhpTranslationFile(lang_path('en/second-en-php-file.php'), ['foo_bar' => 'bar foo']);
+        $this->assertPhpTranslationFile(lang_path('nl/first-nl-php-file.php'), ['bar_foo' => 'foo bar']);
+        $this->assertPhpTranslationFile(lang_path('nl/second-nl-php-file.php'), ['bar' => 'foo']);
     }
 
     /** @test */
@@ -69,11 +69,11 @@ class DownloadCommandTest extends TestCase
 
         $this->artisan('poeditor:download')->assertExitCode(0);
 
-        $this->assertJsonTranslationFile(resource_path('lang/en.json'), [
+        $this->assertJsonTranslationFile(lang_path('en.json'), [
             'first-en-json-key' => 'bar',
             'second-en-json-key' => 'bar foo',
         ]);
-        $this->assertJsonTranslationFile(resource_path('lang/nl.json'), [
+        $this->assertJsonTranslationFile(lang_path('nl.json'), [
             'first-nl-json-key' => 'foo bar',
             'second-nl-json-key' => 'foo',
         ]);
@@ -124,39 +124,39 @@ class DownloadCommandTest extends TestCase
 
         $this->artisan('poeditor:download')->assertExitCode(0);
 
-        $this->assertFalse(file_exists(resource_path('lang/en/vendor.php')));
-        $this->assertFalse(file_exists(resource_path('lang/nl/vendor.php')));
+        $this->assertFalse(file_exists(lang_path('en/vendor.php')));
+        $this->assertFalse(file_exists(lang_path('nl/vendor.php')));
 
         $this->assertPhpTranslationFile(
-            resource_path('lang/vendor/first-package/en/first-package-en-php-file.php'),
+            lang_path('vendor/first-package/en/first-package-en-php-file.php'),
             ['foo' => 'bar']
         );
-        $this->assertJsonTranslationFile(resource_path('lang/vendor/first-package/en.json'), [
+        $this->assertJsonTranslationFile(lang_path('vendor/first-package/en.json'), [
             'first-package-first-en-json-key' => 'bar foo',
             'first-package-second-en-json-key' => 'foo bar',
         ]);
         $this->assertPhpTranslationFile(
-            resource_path('lang/vendor/second-package/en/second-package-en-php-file.php'),
+            lang_path('vendor/second-package/en/second-package-en-php-file.php'),
             ['bar' => 'foo']
         );
-        $this->assertJsonTranslationFile(resource_path('lang/vendor/second-package/en.json'), [
+        $this->assertJsonTranslationFile(lang_path('vendor/second-package/en.json'), [
             'second-package-first-en-json-key' => 'bar foo bar',
             'second-package-second-en-json-key' => 'foo bar foo',
         ]);
 
         $this->assertPhpTranslationFile(
-            resource_path('lang/vendor/first-package/nl/first-package-nl-php-file.php'),
+            lang_path('vendor/first-package/nl/first-package-nl-php-file.php'),
             ['bar' => 'foo']
         );
-        $this->assertJsonTranslationFile(resource_path('lang/vendor/first-package/nl.json'), [
+        $this->assertJsonTranslationFile(lang_path('vendor/first-package/nl.json'), [
             'first-package-first-nl-json-key' => 'foo bar',
             'first-package-second-nl-json-key' => 'bar foo',
         ]);
         $this->assertPhpTranslationFile(
-            resource_path('lang/vendor/second-package/nl/second-package-nl-php-file.php'),
+            lang_path('vendor/second-package/nl/second-package-nl-php-file.php'),
             ['foo' => 'bar']
         );
-        $this->assertJsonTranslationFile(resource_path('lang/vendor/second-package/nl.json'), [
+        $this->assertJsonTranslationFile(lang_path('vendor/second-package/nl.json'), [
             'second-package-first-nl-json-key' => 'foo bar foo',
             'second-package-second-nl-json-key' => 'bar foo bar',
         ]);
@@ -182,18 +182,18 @@ class DownloadCommandTest extends TestCase
 
         $this->artisan('poeditor:download')->assertExitCode(0);
 
-        $this->assertFalse(file_exists(resource_path('lang/en/vendor.php')));
+        $this->assertFalse(file_exists(lang_path('en/vendor.php')));
 
-        $this->assertPhpTranslationFile(resource_path('lang/en/php-file.php'), ['foo' => 'bar']);
-        $this->assertJsonTranslationFile(resource_path('lang/en.json'), ['json-key' => 'bar foo']);
-        $this->assertPhpTranslationFile(resource_path('lang/vendor/package-name/en/package-php-file.php'), ['bar' => 'foo']);
-        $this->assertJsonTranslationFile(resource_path('lang/vendor/package-name/en.json'), ['package-json-key' => 'foo bar foo']);
+        $this->assertPhpTranslationFile(lang_path('en/php-file.php'), ['foo' => 'bar']);
+        $this->assertJsonTranslationFile(lang_path('en.json'), ['json-key' => 'bar foo']);
+        $this->assertPhpTranslationFile(lang_path('vendor/package-name/en/package-php-file.php'), ['bar' => 'foo']);
+        $this->assertJsonTranslationFile(lang_path('vendor/package-name/en.json'), ['package-json-key' => 'foo bar foo']);
     }
 
     /** @test */
     public function it_removes_old_php_translations_of_locale()
     {
-        file_put_contents(resource_path('lang/en/old-php-file.php'), ['foo' => 'bar']);
+        file_put_contents(lang_path('en/old-php-file.php'), ['foo' => 'bar']);
 
         $this->mockPoeditorDownload('en', [
             'new-php-file' => [
@@ -203,28 +203,28 @@ class DownloadCommandTest extends TestCase
 
         $this->artisan('poeditor:download')->assertExitCode(0);
 
-        $this->assertFalse(file_exists(resource_path('lang/en/old-php-file.php')));
-        $this->assertTrue(file_exists(resource_path('lang/en/new-php-file.php')));
+        $this->assertFalse(file_exists(lang_path('en/old-php-file.php')));
+        $this->assertTrue(file_exists(lang_path('en/new-php-file.php')));
     }
 
     /** @test */
     public function it_overrides_old_json_translation_of_locale()
     {
-        file_put_contents(resource_path('lang/en.json'), json_encode(['foo' => 'bar'], JSON_PRETTY_PRINT));
+        file_put_contents(lang_path('en.json'), json_encode(['foo' => 'bar'], JSON_PRETTY_PRINT));
 
         $this->mockPoeditorDownload('en', ['bar' => 'foo']);
 
         $this->artisan('poeditor:download')->assertExitCode(0);
 
-        $this->assertJsonTranslationFile(resource_path('lang/en.json'), ['bar' => 'foo']);
+        $this->assertJsonTranslationFile(lang_path('en.json'), ['bar' => 'foo']);
     }
 
     /** @test */
     public function it_removes_old_php_vendor_translations_of_locale()
     {
-        app(Filesystem::class)->makeDirectory(resource_path('lang/vendor/package-name/en/'), 0755, true);
+        app(Filesystem::class)->makeDirectory(lang_path('vendor/package-name/en/'), 0755, true);
 
-        file_put_contents(resource_path('lang/vendor/package-name/en/old-php-file.php'), ['foo' => 'bar']);
+        file_put_contents(lang_path('vendor/package-name/en/old-php-file.php'), ['foo' => 'bar']);
 
         $this->mockPoeditorDownload('en', [
             'vendor' => [
@@ -238,16 +238,16 @@ class DownloadCommandTest extends TestCase
 
         $this->artisan('poeditor:download')->assertExitCode(0);
 
-        $this->assertFalse(file_exists(resource_path('lang/vendor/package-name/en/old-php-file.php')));
-        $this->assertTrue(file_exists(resource_path('lang/vendor/package-name/en/new-php-file.php')));
+        $this->assertFalse(file_exists(lang_path('vendor/package-name/en/old-php-file.php')));
+        $this->assertTrue(file_exists(lang_path('vendor/package-name/en/new-php-file.php')));
     }
 
     /** @test */
     public function it_overrides_old_json_vendor_translations_of_locale()
     {
-        app(Filesystem::class)->makeDirectory(resource_path('lang/vendor/package-name'), 0755, true);
+        app(Filesystem::class)->makeDirectory(lang_path('vendor/package-name'), 0755, true);
 
-        file_put_contents(resource_path('lang/vendor/package-name/en.json'), json_encode(['foo' => 'bar'], JSON_PRETTY_PRINT));
+        file_put_contents(lang_path('vendor/package-name/en.json'), json_encode(['foo' => 'bar'], JSON_PRETTY_PRINT));
 
         $this->mockPoeditorDownload('en', [
             'vendor' => [
@@ -259,7 +259,7 @@ class DownloadCommandTest extends TestCase
 
         $this->artisan('poeditor:download')->assertExitCode(0);
 
-        $this->assertJsonTranslationFile(resource_path('lang/vendor/package-name/en.json'), ['bar' => 'foo']);
+        $this->assertJsonTranslationFile(lang_path('vendor/package-name/en.json'), ['bar' => 'foo']);
     }
 
     /** @test */
@@ -284,12 +284,12 @@ class DownloadCommandTest extends TestCase
 
         $this->artisan('poeditor:download')->assertExitCode(0);
 
-        $this->assertFalse(file_exists(resource_path('lang/vendor/package-name/en/php-file.php')));
-        $this->assertFalse(file_exists(resource_path('lang/vendor/package-name/en.json')));
-        $this->assertFalse(file_exists(resource_path('lang/en/vendor.php')));
+        $this->assertFalse(file_exists(lang_path('vendor/package-name/en/php-file.php')));
+        $this->assertFalse(file_exists(lang_path('vendor/package-name/en.json')));
+        $this->assertFalse(file_exists(lang_path('en/vendor.php')));
 
-        $this->assertTrue(file_exists(resource_path('lang/en/php-file.php')));
-        $this->assertTrue(file_exists(resource_path('lang/en.json')));
+        $this->assertTrue(file_exists(lang_path('en/php-file.php')));
+        $this->assertTrue(file_exists(lang_path('en.json')));
     }
 
     /** @test */
@@ -303,8 +303,8 @@ class DownloadCommandTest extends TestCase
 
         $this->artisan('poeditor:download')->assertExitCode(0);
 
-        $this->assertTrue(file_exists(resource_path('lang/en/php-file.php')));
-        $this->assertFalse(file_exists(resource_path('lang/en.json')));
+        $this->assertTrue(file_exists(lang_path('en/php-file.php')));
+        $this->assertFalse(file_exists(lang_path('en.json')));
     }
 
     /** @test */
@@ -328,10 +328,10 @@ class DownloadCommandTest extends TestCase
 
         $this->artisan('poeditor:download')->assertExitCode(0);
 
-        $this->assertPhpTranslationFile(resource_path('lang/en/en-php-file.php'), ['foo' => 'bar']);
-        $this->assertJsonTranslationFile(resource_path('lang/en.json'), ['foo bar' => 'bar foo']);
-        $this->assertPhpTranslationFile(resource_path('lang/nl/nl-php-file.php'), ['bar' => 'foo']);
-        $this->assertJsonTranslationFile(resource_path('lang/nl.json'), ['bar foo' => 'foo bar']);
+        $this->assertPhpTranslationFile(lang_path('en/en-php-file.php'), ['foo' => 'bar']);
+        $this->assertJsonTranslationFile(lang_path('en.json'), ['foo bar' => 'bar foo']);
+        $this->assertPhpTranslationFile(lang_path('nl/nl-php-file.php'), ['bar' => 'foo']);
+        $this->assertJsonTranslationFile(lang_path('nl.json'), ['bar foo' => 'foo bar']);
     }
 
     /**

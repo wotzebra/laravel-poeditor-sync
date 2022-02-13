@@ -36,8 +36,8 @@ class TranslationManager
     public function getTranslations(string $locale)
     {
         $translations = array_merge(
-            $this->getPhpTranslations(resource_path("lang/{$locale}")),
-            $this->getJsonTranslations(resource_path("lang/{$locale}.json")),
+            $this->getPhpTranslations(lang_path("/{$locale}")),
+            $this->getJsonTranslations(lang_path("/{$locale}.json")),
         );
 
         if (config('poeditor-sync.include_vendor')) {
@@ -76,11 +76,11 @@ class TranslationManager
      */
     protected function getVendorTranslations(string $locale)
     {
-        if (! $this->filesystem->exists(resource_path('lang/vendor'))) {
+        if (! $this->filesystem->exists(lang_path('vendor'))) {
             return [];
         }
 
-        $directories = collect($this->filesystem->directories(resource_path('lang/vendor')));
+        $directories = collect($this->filesystem->directories(lang_path('vendor')));
 
         $translations = $directories->mapWithKeys(function ($directory) use ($locale) {
             $phpTranslations = $this->getPhpTranslations("$directory/{$locale}");
@@ -149,7 +149,7 @@ class TranslationManager
      */
     protected function createPhpTranslationFiles(array $translations, string $locale)
     {
-        $this->createPhpFiles(resource_path("lang/{$locale}"), $translations);
+        $this->createPhpFiles(lang_path("/{$locale}"), $translations);
     }
 
     /**
@@ -162,7 +162,7 @@ class TranslationManager
      */
     protected function createJsonTranslationFile(array $translations, string $locale)
     {
-        $this->createJsonFile(resource_path("lang/{$locale}.json"), $translations);
+        $this->createJsonFile(lang_path("/{$locale}.json"), $translations);
     }
 
     /**
@@ -180,7 +180,7 @@ class TranslationManager
         }
 
         foreach ($translations['vendor'] as $package => $packageTranslations) {
-            $path = resource_path("lang/vendor/{$package}/{$locale}");
+            $path = lang_path("/vendor/{$package}/{$locale}");
 
             if (! $this->filesystem->exists($path)) {
                 $this->filesystem->makeDirectory($path, 0755, true);
@@ -251,11 +251,11 @@ class TranslationManager
      */
     protected function createEmptyLocaleFolder(string $locale)
     {
-        if (! $this->filesystem->exists(resource_path('lang'))) {
-            $this->filesystem->makeDirectory(resource_path('lang'));
+        if (! $this->filesystem->exists(lang_path('lang'))) {
+            $this->filesystem->makeDirectory(lang_path('lang'));
         }
 
-        $path = resource_path("lang/{$locale}/");
+        $path = lang_path("/{$locale}/");
 
         if (file_exists($path)) {
             $this->filesystem->deleteDirectory($path);
