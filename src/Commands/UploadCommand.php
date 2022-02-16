@@ -57,7 +57,7 @@ class UploadCommand extends Command
     /**
      * Get locale that needs to be used to upload translations.
      *
-     * @return null|string
+     * @return string|null
      */
     protected function getLocale()
     {

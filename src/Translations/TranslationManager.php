@@ -36,8 +36,8 @@ class TranslationManager
     public function getTranslations(string $locale)
     {
         $translations = array_merge(
-            $this->getPhpTranslations(resource_path("lang/{$locale}")),
-            $this->getJsonTranslations(resource_path("lang/{$locale}.json")),
+            $this->getPhpTranslations($this->getLangPath("/{$locale}")),
+            $this->getJsonTranslations($this->getLangPath("/{$locale}.json")),
         );
 
         if (config('poeditor-sync.include_vendor')) {
@@ -76,15 +76,15 @@ class TranslationManager
      */
     protected function getVendorTranslations(string $locale)
     {
-        if (! $this->filesystem->exists(resource_path('lang/vendor'))) {
+        if (! $this->filesystem->exists($this->getLangPath('vendor'))) {
             return [];
         }
 
-        $directories = collect($this->filesystem->directories(resource_path('lang/vendor')));
+        $directories = collect($this->filesystem->directories($this->getLangPath('vendor')));
 
         $translations = $directories->mapWithKeys(function ($directory) use ($locale) {
-            $phpTranslations = $this->getPhpTranslations("$directory/{$locale}");
-            $jsonTranslations = $this->getJsonTranslations("$directory/{$locale}.json");
+            $phpTranslations = $this->getPhpTranslations("${directory}/{$locale}");
+            $jsonTranslations = $this->getJsonTranslations("${directory}/{$locale}.json");
 
             return [basename($directory) => array_merge($phpTranslations, $jsonTranslations)];
         })->toArray();
@@ -149,7 +149,7 @@ class TranslationManager
      */
     protected function createPhpTranslationFiles(array $translations, string $locale)
     {
-        $this->createPhpFiles(resource_path("lang/{$locale}"), $translations);
+        $this->createPhpFiles($this->getLangPath($locale), $translations);
     }
 
     /**
@@ -162,7 +162,7 @@ class TranslationManager
      */
     protected function createJsonTranslationFile(array $translations, string $locale)
     {
-        $this->createJsonFile(resource_path("lang/{$locale}.json"), $translations);
+        $this->createJsonFile($this->getLangPath("/{$locale}.json"), $translations);
     }
 
     /**
@@ -180,7 +180,7 @@ class TranslationManager
         }
 
         foreach ($translations['vendor'] as $package => $packageTranslations) {
-            $path = resource_path("lang/vendor/{$package}/{$locale}");
+            $path = $this->getLangPath("/vendor/{$package}/{$locale}");
 
             if (! $this->filesystem->exists($path)) {
                 $this->filesystem->makeDirectory($path, 0755, true);
@@ -216,7 +216,7 @@ class TranslationManager
 
             $this->filesystem->put(
                 "{$folder}/{$filename}.php",
-                '<?php'.PHP_EOL.PHP_EOL."return {$array};".PHP_EOL,
+                '<?php' . PHP_EOL . PHP_EOL . "return {$array};" . PHP_EOL,
             );
         }
     }
@@ -251,16 +251,32 @@ class TranslationManager
      */
     protected function createEmptyLocaleFolder(string $locale)
     {
-        if (! $this->filesystem->exists(resource_path('lang'))) {
-            $this->filesystem->makeDirectory(resource_path('lang'));
+        if (! $this->filesystem->exists($this->getLangPath())) {
+            $this->filesystem->makeDirectory($this->getLangPath());
         }
 
-        $path = resource_path("lang/{$locale}/");
+        $path = $this->getLangPath($locale);
 
         if (file_exists($path)) {
             $this->filesystem->deleteDirectory($path);
         }
 
         $this->filesystem->makeDirectory($path);
+    }
+
+    /**
+     * Get language path.
+     *
+     * @param string|null $path
+     *
+     * @return string
+     */
+    protected function getLangPath(string $path = null) : string
+    {
+        if (function_exists('lang_path')) {
+            return lang_path($path);
+        }
+
+        return resource_path("lang/{$path}");
     }
 }

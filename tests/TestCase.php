@@ -16,7 +16,7 @@ class TestCase extends BaseTestCase
      *
      * @return void
      */
-    protected function setUp(): void
+    protected function setUp() : void
     {
         parent::setUp();
 
@@ -38,5 +38,21 @@ class TestCase extends BaseTestCase
         return [
             PoeditorSyncServiceProvider::class,
         ];
+    }
+
+    /**
+     * Get language path.
+     *
+     * @param string|null $path
+     *
+     * @return string
+     */
+    protected function getLangPath(string $path = null) : string
+    {
+        if (function_exists('lang_path')) {
+            return lang_path($path);
+        }
+
+        return resource_path("lang/{$path}");
     }
 }
