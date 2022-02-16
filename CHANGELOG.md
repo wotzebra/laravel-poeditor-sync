@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-poeditor-sync` will be documented in this file
 
+## 0.5.0 - 2022-02-16
+
+- Add PHP 8.1 and Laravel 9 support ([#9](https://github.com/nextapps-be/laravel-poeditor-sync/pull/9))
+
 ## 0.4.1 - 2021-07-31
 
  - Prevent unwanted creation of empty 'vendor.php' file when vendor translations are present ([#8](https://github.com/nextapps-be/laravel-poeditor-sync/pull/8))
