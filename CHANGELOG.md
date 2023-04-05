@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-poeditor-sync` will be documented in this file
 
+## 0.6.0 - 2022-04-05
+
+- Add PHP 8.2 and Laravel 10 support ([#10](https://github.com/nextapps-be/laravel-poeditor-sync/pull/10))
+
 ## 0.5.0 - 2022-02-16
 
 - Add PHP 8.1 and Laravel 9 support ([#9](https://github.com/nextapps-be/laravel-poeditor-sync/pull/9))
