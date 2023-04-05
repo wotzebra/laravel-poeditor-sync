@@ -145,7 +145,9 @@ class UploadCommandTest extends TestCase
             'bar_foo' => 'foo bar',
         ]);
 
-        $this->artisan('poeditor:upload nl');
+        config()->set('poeditor-sync.locales', ['en', 'nl']);
+
+        $this->artisan('poeditor:upload nl')->assertExitCode(0);
     }
 
     /** @test */

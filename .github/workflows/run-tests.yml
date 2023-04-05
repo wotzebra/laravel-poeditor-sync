@@ -3,8 +3,6 @@ name: run-tests
 on:
     push:
     pull_request:
-    schedule:
-        -   cron: '0 0 * * *'
 
 jobs:
     run-tests:
@@ -12,17 +10,17 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                php: [7.3, 7.4, 8.0, 8.1]
-                laravel: [7.*, 8.*, 9.*]
-                dependency-version: [ prefer-lowest, prefer-stable ]
-                include:
-                    - laravel: 9.*
-                      testbench: 7.*
-                    - laravel: 8.*
-                      testbench: 6.*
-                    - laravel: 7.*
-                      testbench: 5.*
+                php: [7.3, 7.4, 8.0, 8.1, 8.2]
+                laravel: [7.*, 8.*, 9.*, 10.*]
+                dependency-version: [prefer-lowest, prefer-stable]
                 exclude:
+                    -   php: 8.2
+                        laravel: 9.*
+                        dependency-version: prefer-lowest
+                    -   php: 8.2
+                        laravel: 8.*
+                    -   php: 8.2
+                        laravel: 7.*
                     -   php: 8.1
                         laravel: 8.*
                         dependency-version: prefer-lowest
@@ -34,8 +32,14 @@ jobs:
                     -   php: 8.0
                         laravel: 7.*
                         dependency-version: prefer-lowest
+                    -   php: 8.0
+                        laravel: 10.*
+                    -   php: 7.4
+                        laravel: 10.*
                     -   php: 7.4
                         laravel: 9.*
+                    -   php: 7.3
+                        laravel: 10.*
                     -   php: 7.3
                         laravel: 9.*
 
@@ -46,7 +50,7 @@ jobs:
                 run: sudo apt-get update --fix-missing
 
             -   name: Checkout code
-                uses: actions/checkout@v2
+                uses: actions/checkout@v3
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
@@ -57,10 +61,10 @@ jobs:
             - name: Get Composer cache directory
               id: composer-cache
               run: |
-                echo "::set-output name=dir::$(composer config cache-files-dir)"
+                echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
             - name: Cache Composer packages
-              uses: actions/cache@v2
+              uses: actions/cache@v3
               with:
                 path: ${{ steps.composer-cache.outputs.dir }}
                 key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
@@ -69,7 +73,7 @@ jobs:
 
             -   name: Install dependencies
                 run: |
-                    composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+                    composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
                     composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
 
             -   name: Execute tests
