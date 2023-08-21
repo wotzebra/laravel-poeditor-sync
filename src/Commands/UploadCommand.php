@@ -63,7 +63,7 @@ class UploadCommand extends Command
     {
         $locale = $this->argument('locale') ?? app()->getLocale();
 
-        if (collect(config('poeditor-sync.locales'))->flatten()->doesntContain($locale)) {
+        if (! collect(config('poeditor-sync.locales'))->flatten()->contains($locale)) {
             return;
         }
 
