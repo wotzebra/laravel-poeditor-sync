@@ -32,7 +32,9 @@ class DownloadCommand extends Command
         $this->getLocales()->each(function ($locale, $key) {
             $translations = app(Poeditor::class)->download(is_string($key) ? $key : $locale);
 
-            app(TranslationManager::class)->createTranslationFiles($translations, $locale);
+            collect($locale)->each(function ($val) use ($translations) {
+                app(TranslationManager::class)->createTranslationFiles($translations, $val);
+            });
         });
 
         $this->info('All translations have been downloaded!');

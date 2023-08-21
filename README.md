@@ -39,6 +39,9 @@ You can also provide an associate array, if you want to map POEditor locales to 
 
 // ... Or provide associative array with POEditor locales mapped to internal locales
 'locales' => ['en-gb' => 'en', 'nl-be' => 'nl'],
+
+// ... Or you can map multiple internal locales to the same POEditor locale
+'locales' => ['nl' => ['nl_BE', 'nl_NL']],
 ```
 
 ## Usage

@@ -237,6 +237,36 @@ class UploadCommandTest extends TestCase
     }
 
     /** @test */
+    public function it_maps_one_of_multiple_internal_locale_on_the_poeditor_locale()
+    {
+        config()->set('poeditor-sync.locales', ['nl' => ['nl_BE', 'nl_NL']]);
+
+        $this->createPhpTranslationFile($this->getLangPath('nl_NL/nl-php-file.php'), ['bar' => 'foo NL']);
+        $this->createJsonTranslationFile($this->getLangPath('nl_NL.json'), ['foo_bar' => 'bar foo NL']);
+
+        $this->createPhpTranslationFile($this->getLangPath('nl_BE/nl-php-file.php'), ['bar' => 'foo BE']);
+        $this->createJsonTranslationFile($this->getLangPath('nl_BE.json'), ['foo_bar' => 'bar foo BE']);
+
+        $this->mockPoeditorUpload('nl', [
+            'nl-php-file' => [
+                'bar' => 'foo NL',
+            ],
+            'foo_bar' => 'bar foo NL',
+        ]);
+
+        $this->artisan('poeditor:upload nl_NL')->assertExitCode(0);
+
+        $this->mockPoeditorUpload('nl', [
+            'nl-php-file' => [
+                'bar' => 'foo BE',
+            ],
+            'foo_bar' => 'bar foo BE',
+        ]);
+
+        $this->artisan('poeditor:upload nl_BE')->assertExitCode(0);
+    }
+
+    /** @test */
     public function it_throws_error_if_provided_locale_is_not_present_in_config_locales_array()
     {
         config()->set('poeditor-sync.locales', ['en', 'nl']);
