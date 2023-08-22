@@ -80,8 +80,8 @@ class UploadCommand extends Command
         $locales = config('poeditor-sync.locales');
 
         if (Arr::isAssoc($locales)) {
-            return collect($locales)->filter(function ($val) {
-                return collect($val)->contains($this->getLocale());
+            return collect($locales)->filter(function ($internalLocales) {
+                return collect($internalLocales)->contains($this->getLocale());
             })->keys()->first();
         }
 
