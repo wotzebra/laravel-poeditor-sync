@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-poeditor-sync` will be documented in this file
 
+## 0.7.0 - 2023-08-25
+
+- Add support for mapping multiple internal locales to the same POEditor locale ([#11](https://github.com/nextapps-be/laravel-poeditor-sync/pull/11)) 
+
 ## 0.6.0 - 2022-04-05
 
 - Add PHP 8.2 and Laravel 10 support ([#10](https://github.com/nextapps-be/laravel-poeditor-sync/pull/10))
