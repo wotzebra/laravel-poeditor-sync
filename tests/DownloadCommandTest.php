@@ -334,6 +334,35 @@ class DownloadCommandTest extends TestCase
         $this->assertJsonTranslationFile($this->getLangPath('nl.json'), ['bar foo' => 'foo bar']);
     }
 
+    /** @test */
+    public function it_maps_poeditor_locales_on_multiple_internal_locales()
+    {
+        config()->set('poeditor-sync.locales', ['en' => 'en_GB', 'nl' => ['nl_BE', 'nl_NL']]);
+
+        $this->mockPoeditorDownload('en', [
+            'en-php-file' => [
+                'foo' => 'bar',
+            ],
+            'foo bar' => 'bar foo',
+        ]);
+
+        $this->mockPoeditorDownload('nl', [
+            'nl-php-file' => [
+                'bar' => 'foo',
+            ],
+            'bar foo' => 'foo bar',
+        ]);
+
+        $this->artisan('poeditor:download')->assertExitCode(0);
+
+        $this->assertPhpTranslationFile($this->getLangPath('en_GB/en-php-file.php'), ['foo' => 'bar']);
+        $this->assertJsonTranslationFile($this->getLangPath('en_GB.json'), ['foo bar' => 'bar foo']);
+        $this->assertPhpTranslationFile($this->getLangPath('nl_BE/nl-php-file.php'), ['bar' => 'foo']);
+        $this->assertJsonTranslationFile($this->getLangPath('nl_BE.json'), ['bar foo' => 'foo bar']);
+        $this->assertPhpTranslationFile($this->getLangPath('nl_NL/nl-php-file.php'), ['bar' => 'foo']);
+        $this->assertJsonTranslationFile($this->getLangPath('nl_NL.json'), ['bar foo' => 'foo bar']);
+    }
+
     /**
      * Mock the POEditor "download" method.
      *
