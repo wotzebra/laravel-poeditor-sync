@@ -1,7 +1,6 @@
 # Laravel Poeditor Synchronization
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/nextapps/laravel-poeditor-sync.svg?style=flat-square)](https://packagist.org/packages/nextapps/laravel-poeditor-sync)
-[![GitHub 'Run Tests' Workflow Status](https://img.shields.io/github/workflow/status/nextapps-be/laravel-poeditor-sync/run-tests?label=tests&style=flat-square&logo=github)](https://github.com/nextapps-be/laravel-poeditor-sync/actions?query=workflow%3Arun-tests)
 [![Total Downloads](https://img.shields.io/packagist/dt/nextapps/laravel-poeditor-sync.svg?style=flat-square)](https://packagist.org/packages/nextapps/laravel-poeditor-sync)
 
 Upload and download POEditor translations.
