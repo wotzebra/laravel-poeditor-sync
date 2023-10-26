@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-poeditor-sync` will be documented in this file
 
+## 0.7.1 - 2023-10-26
+
+- Fix PHP deprecation warning in string concatenation ([#12](https://github.com/nextapps-be/laravel-poeditor-sync/pull/12))
+
 ## 0.7.0 - 2023-08-25
 
 - Add support for mapping multiple internal locales to the same POEditor locale ([#11](https://github.com/nextapps-be/laravel-poeditor-sync/pull/11)) 
