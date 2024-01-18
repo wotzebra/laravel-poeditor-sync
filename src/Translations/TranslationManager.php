@@ -258,7 +258,13 @@ class TranslationManager
         $path = $this->getLangPath($locale);
 
         if (file_exists($path)) {
-            $this->filesystem->deleteDirectory($path);
+            foreach ($this->filesystem->allFiles($path) as $file) {
+                if (! in_array($file->getFilename(), config('poeditor-sync.excluded_files', []))) {
+                    $this->filesystem->delete($file->getRealPath());
+                }
+            }
+
+            return;
         }
 
         $this->filesystem->makeDirectory($path);
