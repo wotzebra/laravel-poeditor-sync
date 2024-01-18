@@ -27,13 +27,4 @@ class TestCase extends BaseTestCase
             PoeditorSyncServiceProvider::class,
         ];
     }
-
-    protected function getLangPath(string $path = null) : string
-    {
-        if (function_exists('lang_path')) {
-            return lang_path($path);
-        }
-
-        return resource_path("lang/{$path}");
-    }
 }

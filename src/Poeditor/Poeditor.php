@@ -7,25 +7,13 @@ use InvalidArgumentException;
 
 class Poeditor
 {
-    protected Client $client;
-
-    protected string $apiKey;
-
-    protected string $projectId;
-
-    public function __construct(Client $client, $apiKey, $projectId)
-    {
-        if (! is_string($apiKey) || ! $apiKey) {
-            throw new InvalidArgumentException('Invalid API key');
-        }
-
-        if (! is_string($projectId) || ! $projectId) {
-            throw new InvalidArgumentException('Invalid project id');
-        }
-
-        $this->client = $client;
-        $this->apiKey = $apiKey;
-        $this->projectId = $projectId;
+    public function __construct(
+        public Client $client,
+        public string $apiKey,
+        public string $projectId
+    ) {
+        throw_if(empty($this->apiKey), new InvalidArgumentException('Invalid API key'));
+        throw_if(empty($this->projectId), new InvalidArgumentException('Invalid project id'));
     }
 
     public function download(string $language) : array

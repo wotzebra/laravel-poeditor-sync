@@ -13,17 +13,17 @@ class UploadCommandTest extends TestCase
     {
         parent::setUp();
 
-        app(Filesystem::class)->cleanDirectory($this->getLangPath());
-        app(Filesystem::class)->makeDirectory($this->getLangPath('en'));
+        app(Filesystem::class)->cleanDirectory(lang_path());
+        app(Filesystem::class)->makeDirectory(lang_path('en'));
     }
 
     /** @test */
     public function it_uploads_php_translations_of_default_locale()
     {
-        $this->createPhpTranslationFile($this->getLangPath('en/first-en-php-file.php'), ['foo' => 'bar']);
-        $this->createPhpTranslationFile($this->getLangPath('en/second-en-php-file.php'), ['bar' => 'foo']);
+        $this->createPhpTranslationFile(lang_path('en/first-en-php-file.php'), ['foo' => 'bar']);
+        $this->createPhpTranslationFile(lang_path('en/second-en-php-file.php'), ['bar' => 'foo']);
 
-        $this->createPhpTranslationFile($this->getLangPath('nl/nl-php-file.php'), ['foo_bar' => 'bar foo']);
+        $this->createPhpTranslationFile(lang_path('nl/nl-php-file.php'), ['foo_bar' => 'bar foo']);
 
         $this->mockPoeditorUpload('en', [
             'first-en-php-file' => [
@@ -57,9 +57,9 @@ class UploadCommandTest extends TestCase
     /** @test */
     public function it_uploads_json_translations_of_default_locale()
     {
-        $this->createJsonTranslationFile($this->getLangPath('en.json'), ['foo' => 'bar', 'foo_bar' => 'bar foo']);
+        $this->createJsonTranslationFile(lang_path('en.json'), ['foo' => 'bar', 'foo_bar' => 'bar foo']);
 
-        $this->createJsonTranslationFile($this->getLangPath('nl.json'), ['bar' => 'foo']);
+        $this->createJsonTranslationFile(lang_path('nl.json'), ['bar' => 'foo']);
 
         $this->mockPoeditorUpload('en', [
             'foo' => 'bar',
@@ -72,11 +72,11 @@ class UploadCommandTest extends TestCase
     /** @test */
     public function it_uploads_vendor_translations()
     {
-        $this->createPhpTranslationFile($this->getLangPath('vendor/first-package/en/first-package-php-file.php'), ['bar_foo_bar' => 'foo bar foo']);
-        $this->createJsonTranslationFile($this->getLangPath('vendor/first-package/en.json'), ['bar_foo' => 'foo bar']);
+        $this->createPhpTranslationFile(lang_path('vendor/first-package/en/first-package-php-file.php'), ['bar_foo_bar' => 'foo bar foo']);
+        $this->createJsonTranslationFile(lang_path('vendor/first-package/en.json'), ['bar_foo' => 'foo bar']);
 
-        $this->createPhpTranslationFile($this->getLangPath('vendor/second-package/en/second-package-php-file.php'), ['foo_bar_foo' => 'bar foo bar']);
-        $this->createJsonTranslationFile($this->getLangPath('vendor/second-package/en.json'), ['foo_bar' => 'bar foo']);
+        $this->createPhpTranslationFile(lang_path('vendor/second-package/en/second-package-php-file.php'), ['foo_bar_foo' => 'bar foo bar']);
+        $this->createJsonTranslationFile(lang_path('vendor/second-package/en.json'), ['foo_bar' => 'bar foo']);
 
         $this->mockPoeditorUpload('en', [
             'vendor' => [
@@ -101,10 +101,10 @@ class UploadCommandTest extends TestCase
     /** @test */
     public function it_uploads_php_and_json_and_vendor_translations()
     {
-        $this->createPhpTranslationFile($this->getLangPath('en/php-file.php'), ['bar' => 'foo']);
-        $this->createJsonTranslationFile($this->getLangPath('en.json'), ['foo_bar' => 'bar foo']);
-        $this->createPhpTranslationFile($this->getLangPath('vendor/package-name/en/package-php-file.php'), ['bar_foo_bar' => 'foo bar foo']);
-        $this->createJsonTranslationFile($this->getLangPath('vendor/package-name/en.json'), ['bar_foo' => 'foo bar']);
+        $this->createPhpTranslationFile(lang_path('en/php-file.php'), ['bar' => 'foo']);
+        $this->createJsonTranslationFile(lang_path('en.json'), ['foo_bar' => 'bar foo']);
+        $this->createPhpTranslationFile(lang_path('vendor/package-name/en/package-php-file.php'), ['bar_foo_bar' => 'foo bar foo']);
+        $this->createJsonTranslationFile(lang_path('vendor/package-name/en.json'), ['bar_foo' => 'foo bar']);
 
         $this->mockPoeditorUpload('en', [
             'php-file' => [
@@ -127,11 +127,11 @@ class UploadCommandTest extends TestCase
     /** @test */
     public function it_uploads_translations_of_provided_locale()
     {
-        $this->createPhpTranslationFile($this->getLangPath('en/en-php-file.php'), ['bar' => 'foo']);
-        $this->createJsonTranslationFile($this->getLangPath('en.json'), ['foo_bar' => 'bar foo']);
+        $this->createPhpTranslationFile(lang_path('en/en-php-file.php'), ['bar' => 'foo']);
+        $this->createJsonTranslationFile(lang_path('en.json'), ['foo_bar' => 'bar foo']);
 
-        $this->createPhpTranslationFile($this->getLangPath('nl/nl-php-file.php'), ['foo' => 'bar']);
-        $this->createJsonTranslationFile($this->getLangPath('nl.json'), ['bar_foo' => 'foo bar']);
+        $this->createPhpTranslationFile(lang_path('nl/nl-php-file.php'), ['foo' => 'bar']);
+        $this->createJsonTranslationFile(lang_path('nl.json'), ['bar_foo' => 'foo bar']);
 
         $this->mockPoeditorUpload('nl', [
             'nl-php-file' => [
@@ -173,11 +173,11 @@ class UploadCommandTest extends TestCase
     {
         config()->set('poeditor-sync.include_vendor', false);
 
-        $this->createPhpTranslationFile($this->getLangPath('en/php-file.php'), ['bar' => 'foo']);
-        $this->createJsonTranslationFile($this->getLangPath('en.json'), ['foo_bar' => 'bar foo']);
+        $this->createPhpTranslationFile(lang_path('en/php-file.php'), ['bar' => 'foo']);
+        $this->createJsonTranslationFile(lang_path('en.json'), ['foo_bar' => 'bar foo']);
 
-        $this->createPhpTranslationFile($this->getLangPath('vendor/package-name/en/php-file.php'), ['bar_foo_bar' => 'foo bar foo']);
-        $this->createJsonTranslationFile($this->getLangPath('vendor/package-name/en.json'), ['bar_foo' => 'foo bar']);
+        $this->createPhpTranslationFile(lang_path('vendor/package-name/en/php-file.php'), ['bar_foo_bar' => 'foo bar foo']);
+        $this->createJsonTranslationFile(lang_path('vendor/package-name/en.json'), ['bar_foo' => 'foo bar']);
 
         $this->mockPoeditorUpload('en', [
             'php-file' => [
@@ -197,11 +197,11 @@ class UploadCommandTest extends TestCase
             'validation.php',
         ]);
 
-        $this->createPhpTranslationFile($this->getLangPath('en/php-file.php'), ['bar' => 'foo']);
-        $this->createJsonTranslationFile($this->getLangPath('en.json'), ['foo_bar' => 'bar foo']);
+        $this->createPhpTranslationFile(lang_path('en/php-file.php'), ['bar' => 'foo']);
+        $this->createJsonTranslationFile(lang_path('en.json'), ['foo_bar' => 'bar foo']);
 
-        $this->createPhpTranslationFile($this->getLangPath('en/auth.php'), ['bar' => 'foo']);
-        $this->createPhpTranslationFile($this->getLangPath('en/validation.php'), ['foobar' => 'barfoo']);
+        $this->createPhpTranslationFile(lang_path('en/auth.php'), ['bar' => 'foo']);
+        $this->createPhpTranslationFile(lang_path('en/validation.php'), ['foobar' => 'barfoo']);
 
         $this->mockPoeditorUpload('en', [
             'php-file' => [
@@ -218,8 +218,8 @@ class UploadCommandTest extends TestCase
     {
         config()->set('poeditor-sync.locales', ['en-gb' => 'en']);
 
-        $this->createPhpTranslationFile($this->getLangPath('en/en-php-file.php'), ['bar' => 'foo']);
-        $this->createJsonTranslationFile($this->getLangPath('en.json'), ['foo_bar' => 'bar foo']);
+        $this->createPhpTranslationFile(lang_path('en/en-php-file.php'), ['bar' => 'foo']);
+        $this->createJsonTranslationFile(lang_path('en.json'), ['foo_bar' => 'bar foo']);
 
         $this->mockPoeditorUpload('en-gb', [
             'en-php-file' => [
@@ -236,11 +236,11 @@ class UploadCommandTest extends TestCase
     {
         config()->set('poeditor-sync.locales', ['nl' => ['nl_BE', 'nl_NL']]);
 
-        $this->createPhpTranslationFile($this->getLangPath('nl_NL/nl-php-file.php'), ['bar' => 'foo NL']);
-        $this->createJsonTranslationFile($this->getLangPath('nl_NL.json'), ['foo_bar' => 'bar foo NL']);
+        $this->createPhpTranslationFile(lang_path('nl_NL/nl-php-file.php'), ['bar' => 'foo NL']);
+        $this->createJsonTranslationFile(lang_path('nl_NL.json'), ['foo_bar' => 'bar foo NL']);
 
-        $this->createPhpTranslationFile($this->getLangPath('nl_BE/nl-php-file.php'), ['bar' => 'foo BE']);
-        $this->createJsonTranslationFile($this->getLangPath('nl_BE.json'), ['foo_bar' => 'bar foo BE']);
+        $this->createPhpTranslationFile(lang_path('nl_BE/nl-php-file.php'), ['bar' => 'foo BE']);
+        $this->createJsonTranslationFile(lang_path('nl_BE.json'), ['foo_bar' => 'bar foo BE']);
 
         $this->mockPoeditorUpload('nl', [
             'nl-php-file' => [
