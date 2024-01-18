@@ -8,11 +8,6 @@ use Symfony\Component\VarExporter\VarExporter;
 
 class DownloadCommandTest extends TestCase
 {
-    /**
-     * Setup the test environment.
-     *
-     * @return void
-     */
     protected function setUp() : void
     {
         parent::setUp();
@@ -409,15 +404,7 @@ class DownloadCommandTest extends TestCase
         });
     }
 
-    /**
-     * Assert that PHP translation file exists and contains data.
-     *
-     * @param string $filename
-     * @param array $data
-     *
-     * @return void
-     */
-    public function assertPhpTranslationFile(string $filename, array $data)
+    public function assertPhpTranslationFile(string $filename, array $data) : void
     {
         $this->assertTrue(file_exists($filename));
         $this->assertEquals(
@@ -426,15 +413,7 @@ class DownloadCommandTest extends TestCase
         );
     }
 
-    /**
-     * Assert that JSON translation file exists and contains data.
-     *
-     * @param string $filename
-     * @param array $data
-     *
-     * @return void
-     */
-    public function assertJsonTranslationFile(string $filename, array $data)
+    public function assertJsonTranslationFile(string $filename, array $data) : void
     {
         $this->assertTrue(file_exists($filename));
         $this->assertEquals(json_encode($data, JSON_PRETTY_PRINT), file_get_contents($filename));

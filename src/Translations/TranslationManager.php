@@ -9,31 +9,14 @@ use Symfony\Component\VarExporter\VarExporter;
 
 class TranslationManager
 {
-    /**
-     * @var \Illuminate\Filesystem\Filesystem
-     */
-    protected $filesystem;
+    protected Filesystem $filesystem;
 
-    /**
-     * Create a new manager instance.
-     *
-     * @param \Illuminate\Filesystem\Filesystem $filesystem
-     *
-     * @return void
-     */
     public function __construct(Filesystem $filesystem)
     {
         $this->filesystem = $filesystem;
     }
 
-    /**
-     * Get translations of PHP and JSON translation files in the specified locale.
-     *
-     * @param string $locale
-     *
-     * @return array
-     */
-    public function getTranslations(string $locale)
+    public function getTranslations(string $locale) : array
     {
         $translations = array_merge(
             $this->getPhpTranslations($this->getLangPath("/{$locale}")),
@@ -47,15 +30,7 @@ class TranslationManager
         return $translations;
     }
 
-    /**
-     * Create translation files based on the provided array.
-     *
-     * @param array $translations
-     * @param string $locale
-     *
-     * @return void
-     */
-    public function createTranslationFiles(array $translations, string $locale)
+    public function createTranslationFiles(array $translations, string $locale) : void
     {
         $this->createEmptyLocaleFolder($locale);
 
@@ -67,14 +42,7 @@ class TranslationManager
         }
     }
 
-    /**
-     * Get translations of vendor translation files in the specified locale.
-     *
-     * @param string $locale
-     *
-     * @return array
-     */
-    protected function getVendorTranslations(string $locale)
+    protected function getVendorTranslations(string $locale) : array
     {
         if (! $this->filesystem->exists($this->getLangPath('vendor'))) {
             return [];
@@ -92,14 +60,7 @@ class TranslationManager
         return ['vendor' => $translations];
     }
 
-    /**
-     * Get PHP translations from files in folder.
-     *
-     * @param string $folder
-     *
-     * @return array
-     */
-    protected function getPhpTranslations(string $folder)
+    protected function getPhpTranslations(string $folder) : array
     {
         $files = collect($this->filesystem->files($folder));
 
@@ -123,14 +84,7 @@ class TranslationManager
             ->toArray();
     }
 
-    /**
-     * Get JSON translations from file.
-     *
-     * @param string $filename
-     *
-     * @return array
-     */
-    protected function getJsonTranslations(string $filename)
+    protected function getJsonTranslations(string $filename) : array
     {
         if (! $this->filesystem->exists($filename)) {
             return [];
@@ -139,41 +93,17 @@ class TranslationManager
         return json_decode($this->filesystem->get($filename), true);
     }
 
-    /**
-     * Create PHP translation files containing arrays.
-     *
-     * @param array $translations
-     * @param string $locale
-     *
-     * @return void
-     */
-    protected function createPhpTranslationFiles(array $translations, string $locale)
+    protected function createPhpTranslationFiles(array $translations, string $locale) : void
     {
         $this->createPhpFiles($this->getLangPath($locale), $translations);
     }
 
-    /**
-     * Create JSON translation file containing arrays.
-     *
-     * @param array $translations
-     * @param string $locale
-     *
-     * @return void
-     */
-    protected function createJsonTranslationFile(array $translations, string $locale)
+    protected function createJsonTranslationFile(array $translations, string $locale) : void
     {
         $this->createJsonFile($this->getLangPath("/{$locale}.json"), $translations);
     }
 
-    /**
-     * Create vendor translation files.
-     *
-     * @param array $translations
-     * @param string $locale
-     *
-     * @return void
-     */
-    protected function createVendorTranslationFiles(array $translations, string $locale)
+    protected function createVendorTranslationFiles(array $translations, string $locale) : void
     {
         if (! Arr::has($translations, 'vendor')) {
             return;
@@ -193,15 +123,7 @@ class TranslationManager
         }
     }
 
-    /**
-     * Create PHP translation files in folder.
-     *
-     * @param string $filename
-     * @param array $translations
-     *
-     * @return void
-     */
-    protected function createPhpFiles(string $folder, array $translations)
+    protected function createPhpFiles(string $folder, array $translations) : void
     {
         $translations = Arr::where($translations, function ($translation) {
             return is_array($translation);
@@ -221,15 +143,7 @@ class TranslationManager
         }
     }
 
-    /**
-     * Create JSON translation file on filename.
-     *
-     * @param string $filename
-     * @param array $translations
-     *
-     * @return void
-     */
-    protected function createJsonFile(string $filename, array $translations)
+    protected function createJsonFile(string $filename, array $translations) : void
     {
         $translations = Arr::where($translations, function ($translation) {
             return is_string($translation);
@@ -242,14 +156,7 @@ class TranslationManager
         $this->filesystem->put($filename, json_encode($translations, JSON_PRETTY_PRINT));
     }
 
-    /**
-     * Create empty folder for locale in "lang" resources folder (if folder does not exist yet).
-     *
-     * @param string $locale
-     *
-     * @return void
-     */
-    protected function createEmptyLocaleFolder(string $locale)
+    protected function createEmptyLocaleFolder(string $locale) : void
     {
         if (! $this->filesystem->exists($this->getLangPath())) {
             $this->filesystem->makeDirectory($this->getLangPath());
@@ -270,13 +177,6 @@ class TranslationManager
         $this->filesystem->makeDirectory($path);
     }
 
-    /**
-     * Get language path.
-     *
-     * @param string|null $path
-     *
-     * @return string
-     */
     protected function getLangPath(string $path = null) : string
     {
         if (function_exists('lang_path')) {

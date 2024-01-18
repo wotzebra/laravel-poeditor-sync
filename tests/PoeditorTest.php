@@ -13,21 +13,10 @@ use NextApps\PoeditorSync\Poeditor\UploadResponse;
 
 class PoeditorTest extends TestCase
 {
-    /**
-     * @var \GuzzleHttp\Handler\MockHandler
-     */
-    public $requestMockHandler;
+    public MockHandler $requestMockHandler;
 
-    /**
-     * @var array
-     */
-    public $requestHistoryContainer = [];
+    public array $requestHistoryContainer = [];
 
-    /**
-     * Setup the test environment.
-     *
-     * @return void
-     */
     protected function setUp() : void
     {
         parent::setUp();

@@ -7,30 +7,12 @@ use InvalidArgumentException;
 
 class Poeditor
 {
-    /**
-     * @var \GuzzleHttp\Client
-     */
-    protected $client;
+    protected Client $client;
 
-    /**
-     * @var string
-     */
-    protected $apiKey;
+    protected string $apiKey;
 
-    /**
-     * @var string
-     */
-    protected $projectId;
+    protected string $projectId;
 
-    /**
-     * Create a new manager instance.
-     *
-     * @param \GuzzleHttp\Client $client
-     * @param string $apiKey
-     * @param string $projectId
-     *
-     * @return void
-     */
     public function __construct(Client $client, $apiKey, $projectId)
     {
         if (! is_string($apiKey) || ! $apiKey) {
@@ -46,14 +28,7 @@ class Poeditor
         $this->projectId = $projectId;
     }
 
-    /**
-     * Download translations in the language.
-     *
-     * @param string $language
-     *
-     * @return array
-     */
-    public function download(string $language)
+    public function download(string $language) : array
     {
         $projectResponse = $this->client
             ->post(
@@ -80,16 +55,7 @@ class Poeditor
         return json_decode($exportResponse, true);
     }
 
-    /**
-     * Upload translations in the language.
-     *
-     * @param string $language
-     * @param array $translations
-     * @param bool $overwrite
-     *
-     * @return \NextApps\PoeditorSync\Poeditor\UploadResponse
-     */
-    public function upload(string $language, array $translations, bool $overwrite = false)
+    public function upload(string $language, array $translations, bool $overwrite = false) : UploadResponse
     {
         $filename = stream_get_meta_data($file = tmpfile())['uri'] . '.json';
 
