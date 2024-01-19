@@ -4,6 +4,7 @@ namespace NextApps\PoeditorSync\Tests;
 
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Sleep;
 use InvalidArgumentException;
 use NextApps\PoeditorSync\Poeditor\Poeditor;
 use NextApps\PoeditorSync\Poeditor\UploadResponse;
@@ -95,6 +96,8 @@ class PoeditorTest extends TestCase
 
         $this->assertInstanceOf(UploadResponse::class, $response);
 
+        Http::assertSentCount(1);
+
         Http::assertSent(function (Request $request) use ($locale, $translations) {
             return $request->url() === 'https://api.poeditor.com/v2/projects/upload'
                 && $request->method() === 'POST'
@@ -131,5 +134,58 @@ class PoeditorTest extends TestCase
                     ],
                 ];
         });
+    }
+
+    /** @test */
+    public function it_retries_uploads_translations_if_poeditor_upload_rate_limit_was_hit()
+    {
+        Http::fake([
+            'https://api.poeditor.com/v2/projects/upload' => Http::sequence()
+                ->push([
+                    'response' => [
+                        'status' => 'fail',
+                        'code' => '4048',
+                        'message' => 'Too many upload requests in a short period of time',
+                    ],
+                ])
+                ->push([
+                    'response' => [
+                        'status' => 'success',
+                        'code' => 200,
+                        'message' => 'OK',
+                    ],
+                    'result' => [
+                        'terms' => [
+                            'parsed' => $this->faker->randomNumber(),
+                            'added' => $this->faker->randomNumber(),
+                            'deleted' => $this->faker->randomNumber(),
+                        ],
+                        'translations' => [
+                            'parsed' => $this->faker->randomNumber(),
+                            'added' => $this->faker->randomNumber(),
+                            'updated' => $this->faker->randomNumber(),
+                        ],
+                    ],
+                ]),
+        ]);
+
+        if (class_exists(Sleep::class)) {
+            Sleep::fake();
+        } else {
+            $startTime = time();
+        }
+
+        $response = app(Poeditor::class)->upload($this->faker->locale(), ['key' => 'value']);
+
+        $this->assertInstanceOf(UploadResponse::class, $response);
+
+        Http::assertSentCount(2);
+
+        if (class_exists(Sleep::class)) {
+            Sleep::assertSleptTimes(1);
+            Sleep::assertSequence([Sleep::for(10)->seconds()]);
+        } else {
+            $this->assertTrue(time() - $startTime > 9);
+        }
     }
 }

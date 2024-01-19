@@ -3,6 +3,7 @@
 namespace NextApps\PoeditorSync\Poeditor;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Sleep;
 use InvalidArgumentException;
 
 class Poeditor
@@ -38,9 +39,18 @@ class Poeditor
                 'updating' => 'terms_translations',
                 'overwrite' => (int) $overwrite,
                 'fuzzy_trigger' => 1,
-            ])
-            ->json();
+            ]);
 
-        return new UploadResponse($response);
+        if ($response->json('response.status') === 'fail') {
+            if (class_exists(Sleep::class)) {
+                Sleep::for(10)->seconds();
+            } else {
+                sleep(10);
+            }
+
+            return $this->upload($language, $translations, $overwrite);
+        }
+
+        return new UploadResponse($response->json());
     }
 }
