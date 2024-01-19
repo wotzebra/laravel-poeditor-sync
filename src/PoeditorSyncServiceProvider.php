@@ -2,7 +2,6 @@
 
 namespace NextApps\PoeditorSync;
 
-use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
 use NextApps\PoeditorSync\Commands\DownloadCommand;
 use NextApps\PoeditorSync\Commands\UploadCommand;
@@ -30,7 +29,6 @@ class PoeditorSyncServiceProvider extends ServiceProvider
 
         $this->app->bind(Poeditor::class, function () {
             return new Poeditor(
-                app(Client::class),
                 config('poeditor-sync.api_key'),
                 config('poeditor-sync.project_id')
             );

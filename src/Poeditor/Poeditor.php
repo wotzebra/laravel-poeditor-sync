@@ -2,13 +2,12 @@
 
 namespace NextApps\PoeditorSync\Poeditor;
 
-use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
 
 class Poeditor
 {
     public function __construct(
-        public Client $client,
         public string $apiKey,
         public string $projectId
     ) {
@@ -18,77 +17,30 @@ class Poeditor
 
     public function download(string $language) : array
     {
-        $projectResponse = $this->client
-            ->post(
-                'https://api.poeditor.com/v2/projects/export',
-                [
-                    'form_params' => [
-                        'api_token' => $this->apiKey,
-                        'id' => $this->projectId,
-                        'language' => $language,
-                        'type' => 'key_value_json',
-                    ],
-                ]
-            )
-            ->getBody()
-            ->getContents();
+        $exportUrl = Http::asForm()->post('https://api.poeditor.com/v2/projects/export', [
+            'api_token' => $this->apiKey,
+            'id' => $this->projectId,
+            'language' => $language,
+            'type' => 'key_value_json',
+        ])->json('result.url');
 
-        $exportUrl = json_decode($projectResponse, true)['result']['url'];
-
-        $exportResponse = $this->client
-            ->get($exportUrl)
-            ->getBody()
-            ->getContents();
-
-        return json_decode($exportResponse, true);
+        return Http::get($exportUrl)->json();
     }
 
     public function upload(string $language, array $translations, bool $overwrite = false) : UploadResponse
     {
-        $filename = stream_get_meta_data($file = tmpfile())['uri'] . '.json';
+        $response = Http::asMultipart()
+            ->attach('file', json_encode($translations), 'translations.json')
+            ->post('https://api.poeditor.com/v2/projects/upload', [
+                'api_token' => $this->apiKey,
+                'id' => $this->projectId,
+                'language' => $language,
+                'updating' => 'terms_translations',
+                'overwrite' => (int) $overwrite,
+                'fuzzy_trigger' => 1,
+            ])
+            ->json();
 
-        file_put_contents($filename, json_encode($translations));
-
-        $response = $this->client
-            ->post(
-                'https://api.poeditor.com/v2/projects/upload',
-                [
-                    'multipart' => [
-                        [
-                            'name' => 'api_token',
-                            'contents' => $this->apiKey,
-                        ],
-                        [
-                            'name' => 'id',
-                            'contents' => $this->projectId,
-                        ],
-                        [
-                            'name' => 'language',
-                            'contents' => $language,
-                        ],
-                        [
-                            'name' => 'updating',
-                            'contents' => 'terms_translations',
-                        ],
-                        [
-                            'name' => 'file',
-                            'contents' => fopen($filename, 'r+'),
-                            'filename' => 'translations.json',
-                        ],
-                        [
-                            'name' => 'overwrite',
-                            'contents' => (int) $overwrite,
-                        ],
-                        [
-                            'name' => 'fuzzy_trigger',
-                            'contents' => 1,
-                        ],
-                    ],
-                ]
-            )
-            ->getBody()
-            ->getContents();
-
-        return new UploadResponse(json_decode($response, true));
+        return new UploadResponse($response);
     }
 }
