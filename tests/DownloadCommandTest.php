@@ -208,6 +208,27 @@ class DownloadCommandTest extends TestCase
     }
 
     /** @test */
+    public function it_does_not_remove_php_translations_of_locale_if_php_translation_is_excluded_in_config()
+    {
+        file_put_contents($this->getLangPath('en/excluded-php-file.php'), ['foo' => 'bar']);
+        file_put_contents($this->getLangPath('en/not-excluded-php-file.php'), ['foo' => 'bar']);
+
+        config()->set('poeditor-sync.excluded_files', ['excluded-php-file.php']);
+
+        $this->mockPoeditorDownload('en', [
+            'some-php-file' => [
+                'foo' => 'bar',
+            ],
+        ]);
+
+        $this->artisan('poeditor:download')->assertExitCode(0);
+
+        $this->assertTrue(file_exists($this->getLangPath('en/excluded-php-file.php')));
+        $this->assertFalse(file_exists($this->getLangPath('en/not-excluded-php-file.php')));
+        $this->assertTrue(file_exists($this->getLangPath('en/some-php-file.php')));
+    }
+
+    /** @test */
     public function it_overrides_old_json_translation_of_locale()
     {
         file_put_contents($this->getLangPath('en.json'), json_encode(['foo' => 'bar'], JSON_PRETTY_PRINT));
