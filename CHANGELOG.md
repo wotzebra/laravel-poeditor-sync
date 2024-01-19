@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-poeditor-sync` will be documented in this file
 
+## 0.8.1 - 2024-01-19
+
+- Fixed: Do not delete excluded translation files when downloading poeditor translations ([#14](https://github.com/nextapps-be/laravel-poeditor-sync/pull/14))
+
 ## 0.8.0 - 2023-12-15
 
 - Added: PHP 8.3 support ([#13](https://github.com/nextapps-be/laravel-poeditor-sync/pull/13))
