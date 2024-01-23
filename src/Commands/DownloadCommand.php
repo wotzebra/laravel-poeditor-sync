@@ -25,6 +25,10 @@ class DownloadCommand extends Command
 
         $this->info('All translations have been downloaded!');
 
+        if (config('poeditor-sync.validate_after_download')) {
+            $this->call('poeditor:validate');
+        }
+
         return Command::SUCCESS;
     }
 

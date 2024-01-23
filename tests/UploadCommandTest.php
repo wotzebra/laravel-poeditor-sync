@@ -298,23 +298,14 @@ class UploadCommandTest extends TestCase
 
     public function createPhpTranslationFile(string $filename, array $data) : void
     {
-        if (! app(Filesystem::class)->exists(dirname($filename))) {
-            app(Filesystem::class)->makeDirectory(dirname($filename), 0755, true);
-        }
-
-        file_put_contents(
-            $filename,
-            '<?php' . PHP_EOL . PHP_EOL . 'return ' . VarExporter::export($data) . ';' . PHP_EOL
-        );
+        app(Filesystem::class)->ensureDirectoryExists(dirname($filename), 0755, true);
+        app(Filesystem::class)->put($filename, '<?php' . PHP_EOL . PHP_EOL . 'return ' . VarExporter::export($data) . ';' . PHP_EOL);
     }
 
     public function createJsonTranslationFile(string $filename, array $data) : void
     {
-        if (! app(Filesystem::class)->exists(dirname($filename))) {
-            app(Filesystem::class)->makeDirectory(dirname($filename), 0755, true);
-        }
-
-        file_put_contents($filename, json_encode($data, JSON_PRETTY_PRINT));
+        app(Filesystem::class)->ensureDirectoryExists(dirname($filename), 0755, true);
+        app(Filesystem::class)->put($filename, json_encode($data, JSON_PRETTY_PRINT));
     }
 
     public function getUploadResponse() : UploadResponse
