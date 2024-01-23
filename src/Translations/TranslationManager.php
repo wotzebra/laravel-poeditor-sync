@@ -36,6 +36,51 @@ class TranslationManager
         }
     }
 
+    public function getPossibleInvalidTranslations(string $toBeCheckedLocale, string $compareToLocale) : array
+    {
+        $compareToTranslations = collect($this->getTranslations($compareToLocale))->dot();
+        $toBecheckedTranslations = collect($this->getTranslations($toBeCheckedLocale))->dot();
+
+        $invalidTranslations = $compareToTranslations->filter(
+            function (string $translation, string $key) use ($toBecheckedTranslations) {
+                $toBecheckedTranslation = $toBecheckedTranslations->get($key);
+
+                return empty($toBecheckedTranslation)
+                    || (($replacements = $this->getReplacementKeys($translation))
+                        && $this->getMissingReplacementKeys(
+                                $this->getReplacementKeys($toBecheckedTranslation),
+                                $replacements
+                            )->isNotEmpty()
+                        );
+            }
+        )->map(function (string $translation, string $key) use ($toBecheckedTranslations) {
+            return [
+                'original' => $translation,
+                'translated' => $translated = $toBecheckedTranslations->get($key),
+                'missing' => $this->getMissingReplacementKeys(
+                    $this->getReplacementKeys($translated),
+                    $this->getReplacementKeys($translation)
+                ),
+            ];
+        });
+
+        return $invalidTranslations->toArray();
+    }
+
+    protected function getReplacementKeys(string $translation) : Collection
+    {
+        return Str::matchAll('/:[a-zA-Z][a-zA-Z0-9]*/', $translation);
+    }
+
+    protected function getMissingReplacementKeys(Collection $toBeCheckedReplacementKeys, Collection $replacementKeys) : Collection
+    {
+        return $replacementKeys->reject(function ($replacementKey) use ($toBeCheckedReplacementKeys) {
+            $toBeCheckedReplacementKeys->contains(function ($val) use ($replacementKey) {
+                return Str::lower($val) === Str::lower($replacementKey);
+            });
+        });
+    }
+
     protected function getVendorTranslations(string $locale) : Collection
     {
         if (! $this->filesystem->exists(lang_path('vendor'))) {
