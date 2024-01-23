@@ -19,7 +19,7 @@ class DownloadCommand extends Command
             $translations = app(Poeditor::class)->download(is_string($key) ? $key : $locale);
 
             collect($locale)->each(function ($internalLocale) use ($translations) {
-                app(TranslationManager::class)->createTranslationFiles($translations, $internalLocale);
+                app(TranslationManager::class)->createTranslationFiles(collect($translations), $internalLocale);
             });
         });
 

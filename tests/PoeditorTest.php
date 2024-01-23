@@ -2,73 +2,49 @@
 
 namespace NextApps\PoeditorSync\Tests;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
-use GuzzleHttp\Psr7\Response;
+use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Sleep;
 use InvalidArgumentException;
 use NextApps\PoeditorSync\Poeditor\Poeditor;
 use NextApps\PoeditorSync\Poeditor\UploadResponse;
 
 class PoeditorTest extends TestCase
 {
-    public MockHandler $requestMockHandler;
-
-    public array $requestHistoryContainer = [];
-
-    protected function setUp() : void
-    {
-        parent::setUp();
-
-        $stack = HandlerStack::create($this->requestMockHandler = new MockHandler());
-        $stack->push(Middleware::history($this->requestHistoryContainer));
-
-        app()->instance(Client::class, new Client(['handler' => $stack]));
-    }
-
     /** @test */
     public function it_requests_export_url_and_downloads_it_content()
     {
-        $this->requestMockHandler->append(
-            new Response(200, [], json_encode([
+        Http::fake([
+            'https://api.poeditor.com/v2/projects/export' => Http::response([
                 'response' => [
                     'status' => 'success',
                     'code' => 200,
                     'message' => 'OK',
                 ],
                 'result' => [
-                    'url' => $url = $this->faker->url(),
+                    'url' => $exportUrl = $this->faker->url(),
                 ],
-            ])),
-            new Response(200, [], json_encode([
+            ]),
+            $exportUrl => Http::response([
                 'key' => 'value',
-            ])),
-        );
+            ]),
+        ]);
 
         $translations = app(Poeditor::class)->download($locale = $this->faker->locale());
 
         $this->assertEquals(['key' => 'value'], $translations);
 
-        $getExportUrlRequest = $this->requestHistoryContainer[0]['request'];
-
-        $this->assertEquals('POST', $getExportUrlRequest->getMethod());
-        $this->assertEquals('api.poeditor.com', $getExportUrlRequest->getUri()->getHost());
-        $this->assertEquals('/v2/projects/export', $getExportUrlRequest->getUri()->getPath());
-
-        $getExportUrlRequestBody = [];
-        parse_str($getExportUrlRequest->getBody()->getContents(), $getExportUrlRequestBody);
-
-        $this->assertEquals(config('poeditor-sync.api_key'), $getExportUrlRequestBody['api_token']);
-        $this->assertEquals(config('poeditor-sync.project_id'), $getExportUrlRequestBody['id']);
-        $this->assertEquals($locale, $getExportUrlRequestBody['language']);
-        $this->assertEquals('key_value_json', $getExportUrlRequestBody['type']);
-
-        $downloadExportRequest = $this->requestHistoryContainer[1]['request'];
-
-        $this->assertEquals('GET', $downloadExportRequest->getMethod());
-        $this->assertEquals(parse_url($url, PHP_URL_HOST), $downloadExportRequest->getUri()->getHost());
-        $this->assertEquals(parse_url($url, PHP_URL_PATH), $downloadExportRequest->getUri()->getPath());
+        Http::assertSent(function (Request $request) use ($locale) {
+            return $request->url() === 'https://api.poeditor.com/v2/projects/export'
+                && $request->method() === 'POST'
+                && $request->isForm()
+                && $request->data() === [
+                    'api_token' => config('poeditor-sync.api_key'),
+                    'id' => config('poeditor-sync.project_id'),
+                    'language' => $locale,
+                    'type' => 'key_value_json',
+                ];
+        });
     }
 
     /** @test */
@@ -77,16 +53,6 @@ class PoeditorTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid API key');
         config()->set('poeditor-sync.api_key', '');
-
-        app(Poeditor::class)->download($this->faker->locale());
-    }
-
-    /** @test */
-    public function it_throws_an_error_if_api_key_is_null()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid API key');
-        config()->set('poeditor-sync.api_key', null);
 
         app(Poeditor::class)->download($this->faker->locale());
     }
@@ -102,20 +68,10 @@ class PoeditorTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_an_error_if_project_id_is_null()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid project id');
-        config()->set('poeditor-sync.project_id', null);
-
-        app(Poeditor::class)->download($this->faker->locale());
-    }
-
-    /** @test */
     public function it_uploads_translations()
     {
-        $this->requestMockHandler->append(
-            new Response(200, [], json_encode([
+        Http::fake([
+            'https://api.poeditor.com/v2/projects/upload' => Http::response([
                 'response' => [
                     'status' => 'success',
                     'code' => 200,
@@ -133,17 +89,103 @@ class PoeditorTest extends TestCase
                         'updated' => $this->faker->randomNumber(),
                     ],
                 ],
-            ])),
-        );
+            ]),
+        ]);
+
+        $response = app(Poeditor::class)->upload($locale = $this->faker->locale(), $translations = ['key' => 'value']);
+
+        $this->assertInstanceOf(UploadResponse::class, $response);
+
+        Http::assertSentCount(1);
+
+        Http::assertSent(function (Request $request) use ($locale, $translations) {
+            return $request->url() === 'https://api.poeditor.com/v2/projects/upload'
+                && $request->method() === 'POST'
+                && $request->isMultipart()
+                && $request->data() === [
+                    [
+                        'name' => 'api_token',
+                        'contents' => config('poeditor-sync.api_key'),
+                    ],
+                    [
+                        'name' => 'id',
+                        'contents' => config('poeditor-sync.project_id'),
+                    ],
+                    [
+                        'name' => 'language',
+                        'contents' => $locale,
+                    ],
+                    [
+                        'name' => 'updating',
+                        'contents' => 'terms_translations',
+                    ],
+                    [
+                        'name' => 'overwrite',
+                        'contents' => 0,
+                    ],
+                    [
+                        'name' => 'fuzzy_trigger',
+                        'contents' => 1,
+                    ],
+                    [
+                        'name' => 'file',
+                        'contents' => json_encode($translations),
+                        'filename' => 'translations.json',
+                    ],
+                ];
+        });
+    }
+
+    /** @test */
+    public function it_retries_uploads_translations_if_poeditor_upload_rate_limit_was_hit()
+    {
+        Http::fake([
+            'https://api.poeditor.com/v2/projects/upload' => Http::sequence()
+                ->push([
+                    'response' => [
+                        'status' => 'fail',
+                        'code' => '4048',
+                        'message' => 'Too many upload requests in a short period of time',
+                    ],
+                ])
+                ->push([
+                    'response' => [
+                        'status' => 'success',
+                        'code' => 200,
+                        'message' => 'OK',
+                    ],
+                    'result' => [
+                        'terms' => [
+                            'parsed' => $this->faker->randomNumber(),
+                            'added' => $this->faker->randomNumber(),
+                            'deleted' => $this->faker->randomNumber(),
+                        ],
+                        'translations' => [
+                            'parsed' => $this->faker->randomNumber(),
+                            'added' => $this->faker->randomNumber(),
+                            'updated' => $this->faker->randomNumber(),
+                        ],
+                    ],
+                ]),
+        ]);
+
+        if (class_exists(Sleep::class)) {
+            Sleep::fake();
+        } else {
+            $startTime = time();
+        }
 
         $response = app(Poeditor::class)->upload($this->faker->locale(), ['key' => 'value']);
 
         $this->assertInstanceOf(UploadResponse::class, $response);
 
-        $request = $this->requestHistoryContainer[0]['request'];
+        Http::assertSentCount(2);
 
-        $this->assertEquals('POST', $request->getMethod());
-        $this->assertEquals('api.poeditor.com', $request->getUri()->getHost());
-        $this->assertEquals('/v2/projects/upload', $request->getUri()->getPath());
+        if (class_exists(Sleep::class)) {
+            Sleep::assertSleptTimes(1);
+            Sleep::assertSequence([Sleep::for(10)->seconds()]);
+        } else {
+            $this->assertTrue(time() - $startTime > 9);
+        }
     }
 }

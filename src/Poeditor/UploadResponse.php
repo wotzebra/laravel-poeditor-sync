@@ -4,11 +4,9 @@ namespace NextApps\PoeditorSync\Poeditor;
 
 class UploadResponse
 {
-    protected array $content;
-
-    public function __construct(array $content)
-    {
-        $this->content = $content;
+    public function __construct(
+        protected array $content
+    ) {
     }
 
     public function getAddedTermsCount() : int

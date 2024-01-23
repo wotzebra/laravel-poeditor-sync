@@ -3,85 +3,66 @@
 namespace NextApps\PoeditorSync\Translations;
 
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Symfony\Component\VarExporter\VarExporter;
 
 class TranslationManager
 {
-    protected Filesystem $filesystem;
-
-    public function __construct(Filesystem $filesystem)
-    {
-        $this->filesystem = $filesystem;
+    public function __construct(
+        protected Filesystem $filesystem
+    ) {
     }
 
     public function getTranslations(string $locale) : array
     {
-        $translations = array_merge(
-            $this->getPhpTranslations($this->getLangPath("/{$locale}")),
-            $this->getJsonTranslations($this->getLangPath("/{$locale}.json")),
-        );
-
-        if (config('poeditor-sync.include_vendor')) {
-            $translations += $this->getVendorTranslations($locale);
-        }
-
-        return $translations;
+        return $this->getPhpTranslations(lang_path("/{$locale}"))
+            ->merge($this->getJsonTranslations(lang_path("/{$locale}.json")))
+            ->when($this->includeVendorTranslations(), function ($translations) use ($locale) {
+                return $translations->merge($this->getVendorTranslations($locale));
+            })
+            ->jsonSerialize();
     }
 
-    public function createTranslationFiles(array $translations, string $locale) : void
+    public function createTranslationFiles(Collection $translations, string $locale) : void
     {
         $this->createEmptyLocaleFolder($locale);
 
         $this->createPhpTranslationFiles($translations, $locale);
         $this->createJsonTranslationFile($translations, $locale);
 
-        if (config('poeditor-sync.include_vendor')) {
+        if ($this->includeVendorTranslations()) {
             $this->createVendorTranslationFiles($translations, $locale);
         }
     }
 
-    protected function getVendorTranslations(string $locale) : array
+    protected function getVendorTranslations(string $locale) : Collection
     {
-        if (! $this->filesystem->exists($this->getLangPath('vendor'))) {
-            return [];
+        if (! $this->filesystem->exists(lang_path('vendor'))) {
+            return collect();
         }
 
-        $directories = collect($this->filesystem->directories($this->getLangPath('vendor')));
+        $directories = collect($this->filesystem->directories(lang_path('vendor')));
 
         $translations = $directories->mapWithKeys(function ($directory) use ($locale) {
             $phpTranslations = $this->getPhpTranslations("{$directory}/{$locale}");
             $jsonTranslations = $this->getJsonTranslations("{$directory}/{$locale}.json");
 
-            return [basename($directory) => array_merge($phpTranslations, $jsonTranslations)];
-        })->toArray();
+            return [basename($directory) => $phpTranslations->merge($jsonTranslations)];
+        });
 
-        return ['vendor' => $translations];
+        return collect(['vendor' => $translations]);
     }
 
-    protected function getPhpTranslations(string $folder) : array
+    protected function getPhpTranslations(string $folder) : Collection
     {
-        $files = collect($this->filesystem->files($folder));
-
-        $excludedFiles = collect(config('poeditor-sync.excluded_files', []))
-            ->map(function ($excludedFile) {
-                if (Str::endsWith($excludedFile, '.php')) {
-                    return $excludedFile;
-                }
-
-                return "{$excludedFile}.php";
-            });
-
-        return $files
-            ->reject(function ($file) use ($excludedFiles) {
-                return $excludedFiles->contains($file->getFilename());
-            })->mapWithKeys(function ($file) {
+        return collect($this->filesystem->files($folder))
+            ->reject(fn ($file) => $this->getExcludedFilenames()->contains($file->getFilename()))
+            ->mapWithKeys(function ($file) {
                 $filename = pathinfo($file->getRealPath(), PATHINFO_FILENAME);
 
                 return [$filename => $this->filesystem->getRequire($file->getRealPath())];
-            })
-            ->toArray();
+            });
     }
 
     protected function getJsonTranslations(string $filename) : array
@@ -93,96 +74,77 @@ class TranslationManager
         return json_decode($this->filesystem->get($filename), true);
     }
 
-    protected function createPhpTranslationFiles(array $translations, string $locale) : void
+    protected function createPhpTranslationFiles(Collection $translations, string $locale) : void
     {
-        $this->createPhpFiles($this->getLangPath($locale), $translations);
+        $this->createPhpFiles(lang_path($locale), $translations);
     }
 
-    protected function createJsonTranslationFile(array $translations, string $locale) : void
+    protected function createJsonTranslationFile(Collection $translations, string $locale) : void
     {
-        $this->createJsonFile($this->getLangPath("/{$locale}.json"), $translations);
+        $this->createJsonFile(lang_path("/{$locale}.json"), $translations);
     }
 
-    protected function createVendorTranslationFiles(array $translations, string $locale) : void
+    protected function createVendorTranslationFiles(Collection $translations, string $locale) : void
     {
-        if (! Arr::has($translations, 'vendor')) {
-            return;
-        }
+        collect($translations['vendor'] ?? [])->each(function ($packageTranslations, $package) use ($locale) {
+            $path = lang_path("/vendor/{$package}/{$locale}");
 
-        foreach ($translations['vendor'] as $package => $packageTranslations) {
-            $path = $this->getLangPath("/vendor/{$package}/{$locale}");
+            $this->filesystem->ensureDirectoryExists($path);
+            $this->filesystem->cleanDirectory($path);
 
-            if (! $this->filesystem->exists($path)) {
-                $this->filesystem->makeDirectory($path, 0755, true);
-            } else {
-                $this->filesystem->cleanDirectory($path);
-            }
-
-            $this->createPhpFiles($path, $packageTranslations);
-            $this->createJsonFile("{$path}.json", $packageTranslations);
-        }
-    }
-
-    protected function createPhpFiles(string $folder, array $translations) : void
-    {
-        $translations = Arr::where($translations, function ($translation) {
-            return is_array($translation);
+            $this->createPhpFiles($path, collect($packageTranslations));
+            $this->createJsonFile("{$path}.json", collect($packageTranslations));
         });
+    }
 
-        foreach ($translations as $filename => $fileTranslations) {
-            $array = VarExporter::export($fileTranslations);
-
+    protected function createPhpFiles(string $folder, Collection $translations) : void
+    {
+        $translations->filter(function ($translation) {
+            return is_array($translation);
+        })->each(function ($fileTranslations, $filename) use ($folder) {
             if ($filename === 'vendor') {
-                continue;
+                return;
             }
 
             $this->filesystem->put(
                 "{$folder}/{$filename}.php",
-                '<?php' . PHP_EOL . PHP_EOL . "return {$array};" . PHP_EOL,
+                '<?php' . PHP_EOL . PHP_EOL . 'return ' . VarExporter::export($fileTranslations) . ';' . PHP_EOL,
             );
-        }
+        });
     }
 
-    protected function createJsonFile(string $filename, array $translations) : void
+    protected function createJsonFile(string $filename, Collection $translations) : void
     {
-        $translations = Arr::where($translations, function ($translation) {
+        $translations->filter(function ($translation) {
             return is_string($translation);
+        })->whenNotEmpty(function ($translations) use ($filename) {
+            $this->filesystem->put($filename, json_encode($translations, JSON_PRETTY_PRINT));
         });
-
-        if (empty($translations)) {
-            return;
-        }
-
-        $this->filesystem->put($filename, json_encode($translations, JSON_PRETTY_PRINT));
     }
 
     protected function createEmptyLocaleFolder(string $locale) : void
     {
-        if (! $this->filesystem->exists($this->getLangPath())) {
-            $this->filesystem->makeDirectory($this->getLangPath());
-        }
+        $this->filesystem->ensureDirectoryExists(lang_path());
+        $this->filesystem->ensureDirectoryExists($path = lang_path($locale));
 
-        $path = $this->getLangPath($locale);
-
-        if (file_exists($path)) {
-            foreach ($this->filesystem->allFiles($path) as $file) {
-                if (! in_array($file->getFilename(), config('poeditor-sync.excluded_files', []))) {
-                    $this->filesystem->delete($file->getRealPath());
-                }
-            }
-
-            return;
-        }
-
-        $this->filesystem->makeDirectory($path);
+        collect($this->filesystem->allFiles($path))
+            ->filter(fn ($file) => $this->getExcludedFilenames()->doesntContain($file->getFilename()))
+            ->each(fn ($file) => $this->filesystem->delete($file->getRealPath()));
     }
 
-    protected function getLangPath(string $path = null) : string
+    protected function getExcludedFilenames() : Collection
     {
-        if (function_exists('lang_path')) {
-            return lang_path($path);
-        }
+        return collect(config('poeditor-sync.excluded_files', []))->map(function ($excludedFile) {
+            if (Str::endsWith($excludedFile, '.php')) {
+                return $excludedFile;
+            }
 
-        return resource_path("lang/{$path}");
+            return "{$excludedFile}.php";
+        });
+    }
+
+    protected function includeVendorTranslations() : bool
+    {
+        return config('poeditor-sync.include_vendor');
     }
 }
