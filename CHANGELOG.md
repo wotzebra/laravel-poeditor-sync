@@ -2,6 +2,12 @@
 
 All notable changes to `laravel-poeditor-sync` will be documented in this file
 
+## 1.0.0 - 2024-01-23
+
+- Changed: Modernize codebase ([#16](https://github.com/nextapps-be/laravel-poeditor-sync/pull/16))
+- Removed: Drop support for PHP 7.4 until 8.0  and for Laravel 7 and 8 ([#15](https://github.com/nextapps-be/laravel-poeditor-sync/pull/15))
+- Removed: Docblocks (add typehints instead) ([#15](https://github.com/nextapps-be/laravel-poeditor-sync/pull/15))
+
 ## 0.8.1 - 2024-01-19
 
 - Fixed: Do not delete excluded translation files when downloading poeditor translations ([#14](https://github.com/nextapps-be/laravel-poeditor-sync/pull/14))
