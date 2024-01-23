@@ -10,10 +10,7 @@ use NextApps\PoeditorSync\Poeditor\Poeditor;
 
 class PoeditorSyncServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap the application services.
-     */
-    public function boot()
+    public function boot() : void
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
@@ -27,10 +24,7 @@ class PoeditorSyncServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Register the application services.
-     */
-    public function register()
+    public function register() : void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/poeditor-sync.php', 'poeditor-sync');
 

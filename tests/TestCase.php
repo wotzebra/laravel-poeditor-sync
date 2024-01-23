@@ -11,11 +11,6 @@ class TestCase extends BaseTestCase
 {
     use WithFaker;
 
-    /**
-     * Setup the test environment.
-     *
-     * @return void
-     */
     protected function setUp() : void
     {
         parent::setUp();
@@ -26,27 +21,13 @@ class TestCase extends BaseTestCase
         config()->set('poeditor-sync.include_vendor', true);
     }
 
-    /**
-     * Register package providers.
-     *
-     * @param mixed $app
-     *
-     * @return array
-     */
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app) : array
     {
         return [
             PoeditorSyncServiceProvider::class,
         ];
     }
 
-    /**
-     * Get language path.
-     *
-     * @param string|null $path
-     *
-     * @return string
-     */
     protected function getLangPath(string $path = null) : string
     {
         if (function_exists('lang_path')) {

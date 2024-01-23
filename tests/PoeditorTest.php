@@ -13,21 +13,10 @@ use NextApps\PoeditorSync\Poeditor\UploadResponse;
 
 class PoeditorTest extends TestCase
 {
-    /**
-     * @var \GuzzleHttp\Handler\MockHandler
-     */
-    public $requestMockHandler;
+    public MockHandler $requestMockHandler;
 
-    /**
-     * @var array
-     */
-    public $requestHistoryContainer = [];
+    public array $requestHistoryContainer = [];
 
-    /**
-     * Setup the test environment.
-     *
-     * @return void
-     */
     protected function setUp() : void
     {
         parent::setUp();
@@ -49,7 +38,7 @@ class PoeditorTest extends TestCase
                     'message' => 'OK',
                 ],
                 'result' => [
-                    'url' => $url = $this->faker->url,
+                    'url' => $url = $this->faker->url(),
                 ],
             ])),
             new Response(200, [], json_encode([
@@ -57,7 +46,7 @@ class PoeditorTest extends TestCase
             ])),
         );
 
-        $translations = app(Poeditor::class)->download($locale = $this->faker->locale);
+        $translations = app(Poeditor::class)->download($locale = $this->faker->locale());
 
         $this->assertEquals(['key' => 'value'], $translations);
 
@@ -89,7 +78,7 @@ class PoeditorTest extends TestCase
         $this->expectExceptionMessage('Invalid API key');
         config()->set('poeditor-sync.api_key', '');
 
-        app(Poeditor::class)->download($this->faker->locale);
+        app(Poeditor::class)->download($this->faker->locale());
     }
 
     /** @test */
@@ -99,7 +88,7 @@ class PoeditorTest extends TestCase
         $this->expectExceptionMessage('Invalid API key');
         config()->set('poeditor-sync.api_key', null);
 
-        app(Poeditor::class)->download($this->faker->locale);
+        app(Poeditor::class)->download($this->faker->locale());
     }
 
     /** @test */
@@ -109,7 +98,7 @@ class PoeditorTest extends TestCase
         $this->expectExceptionMessage('Invalid project id');
         config()->set('poeditor-sync.project_id', '');
 
-        app(Poeditor::class)->download($this->faker->locale);
+        app(Poeditor::class)->download($this->faker->locale());
     }
 
     /** @test */
@@ -119,7 +108,7 @@ class PoeditorTest extends TestCase
         $this->expectExceptionMessage('Invalid project id');
         config()->set('poeditor-sync.project_id', null);
 
-        app(Poeditor::class)->download($this->faker->locale);
+        app(Poeditor::class)->download($this->faker->locale());
     }
 
     /** @test */
@@ -134,20 +123,20 @@ class PoeditorTest extends TestCase
                 ],
                 'result' => [
                     'terms' => [
-                        'parsed' => $this->faker->randomNumber,
-                        'added' => $this->faker->randomNumber,
-                        'deleted' => $this->faker->randomNumber,
+                        'parsed' => $this->faker->randomNumber(),
+                        'added' => $this->faker->randomNumber(),
+                        'deleted' => $this->faker->randomNumber(),
                     ],
                     'translations' => [
-                        'parsed' => $this->faker->randomNumber,
-                        'added' => $this->faker->randomNumber,
-                        'updated' => $this->faker->randomNumber,
+                        'parsed' => $this->faker->randomNumber(),
+                        'added' => $this->faker->randomNumber(),
+                        'updated' => $this->faker->randomNumber(),
                     ],
                 ],
             ])),
         );
 
-        $response = app(Poeditor::class)->upload($this->faker->locale, ['key' => 'value']);
+        $response = app(Poeditor::class)->upload($this->faker->locale(), ['key' => 'value']);
 
         $this->assertInstanceOf(UploadResponse::class, $response);
 

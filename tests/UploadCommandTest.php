@@ -9,11 +9,6 @@ use Symfony\Component\VarExporter\VarExporter;
 
 class UploadCommandTest extends TestCase
 {
-    /**
-     * Setup the test environment.
-     *
-     * @return void
-     */
     protected function setUp() : void
     {
         parent::setUp();
@@ -292,16 +287,6 @@ class UploadCommandTest extends TestCase
             ->expectsOutput('Invalid locale provided!');
     }
 
-    /**
-     * Mock the POEditor "upload" method.
-     *
-     * @param string $language
-     * @param array $translations
-     * @param bool $overwrite
-     * @param \NextApps\PoeditorSync\Poeditor\UploadResponse $response
-     *
-     * @return void
-     */
     public function mockPoeditorUpload(string $language, array $translations, bool $overwrite = false, UploadResponse $response = null)
     {
         $this->mock(Poeditor::class, function ($mock) use ($language, $translations, $overwrite, $response) {
@@ -311,15 +296,7 @@ class UploadCommandTest extends TestCase
         });
     }
 
-    /**
-     * Create PHP translation file.
-     *
-     * @param string $filename
-     * @param array $data
-     *
-     * @return void
-     */
-    public function createPhpTranslationFile(string $filename, array $data)
+    public function createPhpTranslationFile(string $filename, array $data) : void
     {
         if (! app(Filesystem::class)->exists(dirname($filename))) {
             app(Filesystem::class)->makeDirectory(dirname($filename), 0755, true);
@@ -331,15 +308,7 @@ class UploadCommandTest extends TestCase
         );
     }
 
-    /**
-     * Create JSON translation file exists and contains data.
-     *
-     * @param string $filename
-     * @param array $data
-     *
-     * @return void
-     */
-    public function createJsonTranslationFile(string $filename, array $data)
+    public function createJsonTranslationFile(string $filename, array $data) : void
     {
         if (! app(Filesystem::class)->exists(dirname($filename))) {
             app(Filesystem::class)->makeDirectory(dirname($filename), 0755, true);
@@ -348,20 +317,12 @@ class UploadCommandTest extends TestCase
         file_put_contents($filename, json_encode($data, JSON_PRETTY_PRINT));
     }
 
-    /**
-     * Get upload response.
-     *
-     * @param string $filename
-     * @param array $data
-     *
-     * @return \NextApps\PoeditorSync\Poeditor\UploadResponse
-     */
-    public function getUploadResponse()
+    public function getUploadResponse() : UploadResponse
     {
         return new UploadResponse([
             'result' => [
-                'terms' => ['added' => $this->faker->randomNumber, 'deleted' => $this->faker->randomNumber],
-                'translations' => ['added' => $this->faker->randomNumber, 'updated' => $this->faker->randomNumber],
+                'terms' => ['added' => $this->faker->randomNumber(), 'deleted' => $this->faker->randomNumber()],
+                'translations' => ['added' => $this->faker->randomNumber(), 'updated' => $this->faker->randomNumber()],
             ],
         ]);
     }
