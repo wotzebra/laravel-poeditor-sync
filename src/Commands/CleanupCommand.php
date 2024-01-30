@@ -17,7 +17,7 @@ class CleanupCommand extends Command
         app(TranslationManager::class)->removeEmptyTranslations();
 
         // run poeditor:update command if translations don't exist anymore + ask confirmation
-        if(app(TranslationManager::class)->translationsDontExistAnymore()
+        if (app(TranslationManager::class)->translationsDontExistAnymore()
             && $this->confirm('Some translations don\'t exist anymore. Do you want to run poeditor:update command?')
         ) {
             $this->call('poeditor:update');

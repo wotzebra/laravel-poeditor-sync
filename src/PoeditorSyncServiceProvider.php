@@ -22,7 +22,7 @@ class PoeditorSyncServiceProvider extends ServiceProvider
                 DownloadCommand::class,
                 UploadCommand::class,
                 ValidateTranslationsCommand::class,
-                CleanupCommand::class
+                CleanupCommand::class,
             ]);
         }
     }

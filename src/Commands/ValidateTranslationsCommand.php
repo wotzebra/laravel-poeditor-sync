@@ -16,7 +16,7 @@ class ValidateTranslationsCommand extends Command
         $stringVariables = collect(config('app.supported_locales'))->map(
             fn ($language) => [
                 $language,
-                app(TranslationManager::class)->countStringVariables($language)
+                app(TranslationManager::class)->countStringVariables($language),
             ]
         );
 
@@ -26,13 +26,13 @@ class ValidateTranslationsCommand extends Command
             $stringVariables->toArray()
         );
 
-        if($stringVariables->max(fn ($item) => $item[1]) !== $stringVariables->min(fn ($item) => $item[1])) {
+        if ($stringVariables->max(fn ($item) => $item[1]) !== $stringVariables->min(fn ($item) => $item[1])) {
             $this->info('It seems there are some string variables that are not available in other languages.');
 
             $extraStringVariables = app(TranslationManager::class)->getExtraStringVariables();
 
-            if($extraStringVariables->isNotEmpty()) {
-                $this->info('There might be something wrong with the string variables for the following translation keys:');
+            if ($extraStringVariables->isNotEmpty()) {
+                $this->info('There could be something wrong with the string variables for these translation keys:');
                 $this->table(
                     ['Extra string variables'],
                     $extraStringVariables->map(fn ($item) => [$item])->toArray()
@@ -42,7 +42,7 @@ class ValidateTranslationsCommand extends Command
 
         $invalidTranslations = app(TranslationManager::class)->getPossibleInvalidTranslations();
 
-        if($invalidTranslations->isNotEmpty()) {
+        if ($invalidTranslations->isNotEmpty()) {
             $this->info('It seems there are some translations that could be invalid in some languages.');
             $this->table(
                 ['Language', 'Translation key', 'Original', 'Translated', 'Missing'],
@@ -52,7 +52,7 @@ class ValidateTranslationsCommand extends Command
                         $item['key'],
                         $item['original'],
                         $item['translated'],
-                        $item['missing']->implode(', ')
+                        $item['missing']->implode(', '),
                     ]
                 )->toArray()
             );
@@ -60,7 +60,7 @@ class ValidateTranslationsCommand extends Command
 
         $pluralizationErrors = app(TranslationManager::class)->checkPluralization();
 
-        if($pluralizationErrors->isNotEmpty()) {
+        if ($pluralizationErrors->isNotEmpty()) {
             $this->info('There might be something wrong with the pluralization for the following translation key:');
             $this->table(
                 ['Translation key'],

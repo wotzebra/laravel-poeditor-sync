@@ -41,7 +41,7 @@ class TranslationManager
         $fallbackLocale = config('app.fallback_locale');
         $appLanguages = collect(config('app.supported_locales'))->reject(fn ($locale) => $locale === $fallbackLocale);
 
-        return $appLanguages->map(function ($locale) use ($fallbackLocale){
+        return $appLanguages->map(function ($locale) use ($fallbackLocale) {
             $toBecheckedTranslations = collect($this->getTranslations($locale))->dot();
 
             return collect($this->getTranslations($fallbackLocale))->dot()->filter(
@@ -49,12 +49,13 @@ class TranslationManager
                     $toBecheckedTranslation = $toBecheckedTranslations->get($key);
 
                     return empty($toBecheckedTranslation)
-                        || (($replacements = $this->getReplacementKeys($translation))
+                        || (
+                            ($replacements = $this->getReplacementKeys($translation))
                             && $this->getMissingReplacementKeys(
-                                    $this->getReplacementKeys($toBecheckedTranslation),
-                                    $replacements
-                                )->isNotEmpty()
-                            );
+                                $this->getReplacementKeys($toBecheckedTranslation),
+                                $replacements
+                            )->isNotEmpty()
+                        );
                 }
             )->map(function (string $translation, string $key) use ($toBecheckedTranslations, $locale) {
                 return [
@@ -77,15 +78,16 @@ class TranslationManager
 
         $stringVariables = [];
 
-        $appLanguages->each(function ($locale) use(&$stringVariables){
+        $appLanguages->each(function ($locale) use (&$stringVariables) {
             collect($this->getTranslations($locale))
                 ->dot()
-                ->mapWithKeys(function($translation, $key){
+                ->mapWithKeys(function ($translation, $key) {
                     $matched = preg_match_all('/({\d*}*)|(\|)|(\[\d*,(?:\d+|\**)\])/', $translation, $matches);
+
                     return [$key => $matched ? $matches[0] : []];
                 })
                 ->each(function ($matches, $key) use (&$stringVariables, $locale) {
-                    if(!isset($stringVariables[$key])){
+                    if (! isset($stringVariables[$key])) {
                         $stringVariables[$key] = [];
                     }
 
@@ -94,8 +96,8 @@ class TranslationManager
         });
 
         return collect($stringVariables)
-            ->reject(function ($matches) use($appLanguages){
-                if (collect($matches)->keys()->toArray() !== $appLanguages->toArray()){
+            ->reject(function ($matches) use ($appLanguages) {
+                if (collect($matches)->keys()->toArray() !== $appLanguages->toArray()) {
                     return false;
                 }
 
@@ -116,25 +118,25 @@ class TranslationManager
 
         $stringVariables = [];
 
-        $appLanguages->each(function ($locale) use(&$stringVariables){
-            collect($this->getTranslations($locale))->dot()->filter(function($translation){
+        $appLanguages->each(function ($locale) use (&$stringVariables) {
+            collect($this->getTranslations($locale))->dot()->filter(function ($translation) {
                 return $this->getReplacementKeys($translation)->isNotEmpty();
-            })->map(function ($translation, $key){
+            })->map(function ($translation, $key) {
                 return $this->getReplacementKeys($translation)->map(function ($replacementKey) use ($key) {
                     return $key . '.' . Str::lower($replacementKey);
                 });
             })
-            ->flatten()
-            ->each(function ($translation) use (&$stringVariables, $locale) {
-                if(!isset($stringVariables[$translation])){
-                    $stringVariables[$translation] = [];
-                }
+                ->flatten()
+                ->each(function ($translation) use (&$stringVariables, $locale) {
+                    if (! isset($stringVariables[$translation])) {
+                        $stringVariables[$translation] = [];
+                    }
 
-                $stringVariables[$translation][] = $locale;
-            });
+                    $stringVariables[$translation][] = $locale;
+                });
         });
 
-        return collect($stringVariables)->reject(function ($locales) use($appLanguages){
+        return collect($stringVariables)->reject(function ($locales) use ($appLanguages) {
             return $locales === $appLanguages->toArray();
         })->keys();
     }
@@ -144,8 +146,10 @@ class TranslationManager
         return Str::matchAll('/:[a-zA-Z][a-zA-Z0-9]*/', $translation);
     }
 
-    protected function getMissingReplacementKeys(Collection $toBeCheckedReplacementKeys, Collection $replacementKeys) : Collection
-    {
+    protected function getMissingReplacementKeys(
+        Collection $toBeCheckedReplacementKeys,
+        Collection $replacementKeys
+    ) : Collection {
         return $replacementKeys->reject(function ($replacementKey) use ($toBeCheckedReplacementKeys) {
             return $toBeCheckedReplacementKeys->contains(function ($val) use ($replacementKey) {
                 return Str::lower($val) === Str::lower($replacementKey);
