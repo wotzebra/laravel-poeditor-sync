@@ -25,6 +25,10 @@ class DownloadCommand extends Command
 
         $this->info('All translations have been downloaded!');
 
+        $this->info('Running validate command:');
+
+        $this->call('poeditor:validate');
+
         return Command::SUCCESS;
     }
 

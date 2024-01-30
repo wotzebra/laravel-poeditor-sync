@@ -36,35 +36,107 @@ class TranslationManager
         }
     }
 
-    public function getPossibleInvalidTranslations(string $toBeCheckedLocale, string $compareToLocale) : array
+    public function getPossibleInvalidTranslations() : Collection
     {
-        $compareToTranslations = collect($this->getTranslations($compareToLocale))->dot();
-        $toBecheckedTranslations = collect($this->getTranslations($toBeCheckedLocale))->dot();
+        $fallbackLocale = config('app.fallback_locale');
+        $appLanguages = collect(config('app.supported_locales'))->reject(fn ($locale) => $locale === $fallbackLocale);
 
-        $invalidTranslations = $compareToTranslations->filter(
-            function (string $translation, string $key) use ($toBecheckedTranslations) {
-                $toBecheckedTranslation = $toBecheckedTranslations->get($key);
+        return $appLanguages->map(function ($locale) use ($fallbackLocale){
+            $toBecheckedTranslations = collect($this->getTranslations($locale))->dot();
 
-                return empty($toBecheckedTranslation)
-                    || (($replacements = $this->getReplacementKeys($translation))
-                        && $this->getMissingReplacementKeys(
-                                $this->getReplacementKeys($toBecheckedTranslation),
-                                $replacements
-                            )->isNotEmpty()
-                        );
-            }
-        )->map(function (string $translation, string $key) use ($toBecheckedTranslations) {
-            return [
-                'original' => $translation,
-                'translated' => $translated = $toBecheckedTranslations->get($key),
-                'missing' => $this->getMissingReplacementKeys(
-                    $this->getReplacementKeys($translated),
-                    $this->getReplacementKeys($translation)
-                ),
-            ];
+            return collect($this->getTranslations($fallbackLocale))->dot()->filter(
+                function (string $translation, string $key) use ($toBecheckedTranslations) {
+                    $toBecheckedTranslation = $toBecheckedTranslations->get($key);
+
+                    return empty($toBecheckedTranslation)
+                        || (($replacements = $this->getReplacementKeys($translation))
+                            && $this->getMissingReplacementKeys(
+                                    $this->getReplacementKeys($toBecheckedTranslation),
+                                    $replacements
+                                )->isNotEmpty()
+                            );
+                }
+            )->map(function (string $translation, string $key) use ($toBecheckedTranslations, $locale) {
+                return [
+                    'key' => $key,
+                    'locale' => $locale,
+                    'original' => $translation,
+                    'translated' => $translated = $toBecheckedTranslations->get($key),
+                    'missing' => $this->getMissingReplacementKeys(
+                        $this->getReplacementKeys($translated),
+                        $this->getReplacementKeys($translation)
+                    ),
+                ];
+            });
+        })->flatten(1);
+    }
+
+    public function checkPluralization() : Collection
+    {
+        $appLanguages = collect(config('app.supported_locales'));
+
+        $stringVariables = [];
+
+        $appLanguages->each(function ($locale) use(&$stringVariables){
+            collect($this->getTranslations($locale))
+                ->dot()
+                ->mapWithKeys(function($translation, $key){
+                    $matched = preg_match_all('/({\d*}*)|(\|)|(\[\d*,(?:\d+|\**)\])/', $translation, $matches);
+                    return [$key => $matched ? $matches[0] : []];
+                })
+                ->each(function ($matches, $key) use (&$stringVariables, $locale) {
+                    if(!isset($stringVariables[$key])){
+                        $stringVariables[$key] = [];
+                    }
+
+                    $stringVariables[$key][$locale] = $matches;
+                });
         });
 
-        return $invalidTranslations->toArray();
+        return collect($stringVariables)
+            ->reject(function ($matches) use($appLanguages){
+                if (collect($matches)->keys()->toArray() !== $appLanguages->toArray()){
+                    return false;
+                }
+
+                return collect($matches)->unique()->count() === 1;
+            })->keys();
+    }
+
+    public function countStringVariables(string $locale) : int
+    {
+        return collect($this->getTranslations($locale))->dot()->sum(function (string $translation) {
+            return $this->getReplacementKeys($translation)->count();
+        });
+    }
+
+    public function getExtraStringVariables() : Collection
+    {
+        $appLanguages = collect(config('app.supported_locales'));
+
+        $stringVariables = [];
+
+        $appLanguages->each(function ($locale) use(&$stringVariables){
+            collect($this->getTranslations($locale))->dot()->filter(function($translation){
+                return $this->getReplacementKeys($translation)->isNotEmpty();
+            })->map(function ($translation, $key){
+                return $this->getReplacementKeys($translation)->map(function ($replacementKey) use ($key) {
+                    return $key . '.' . Str::lower($replacementKey);
+                });
+            })
+            ->flatten()
+            ->each(function ($translation) use (&$stringVariables, $locale) {
+                if(!isset($stringVariables[$translation])){
+                    $stringVariables[$translation] = [];
+                }
+
+                $stringVariables[$translation][] = $locale;
+            });
+        });
+
+        return collect($stringVariables)->reject(function ($locales) use($appLanguages){
+            return $locales === $appLanguages->toArray();
+        })->keys();
     }
 
     protected function getReplacementKeys(string $translation) : Collection
@@ -75,7 +147,7 @@ class TranslationManager
     protected function getMissingReplacementKeys(Collection $toBeCheckedReplacementKeys, Collection $replacementKeys) : Collection
     {
         return $replacementKeys->reject(function ($replacementKey) use ($toBeCheckedReplacementKeys) {
-            $toBeCheckedReplacementKeys->contains(function ($val) use ($replacementKey) {
+            return $toBeCheckedReplacementKeys->contains(function ($val) use ($replacementKey) {
                 return Str::lower($val) === Str::lower($replacementKey);
             });
         });

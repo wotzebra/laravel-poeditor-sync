@@ -3,8 +3,10 @@
 namespace NextApps\PoeditorSync;
 
 use Illuminate\Support\ServiceProvider;
+use NextApps\PoeditorSync\Commands\CleanupCommand;
 use NextApps\PoeditorSync\Commands\DownloadCommand;
 use NextApps\PoeditorSync\Commands\UploadCommand;
+use NextApps\PoeditorSync\Commands\ValidateTranslationsCommand;
 use NextApps\PoeditorSync\Poeditor\Poeditor;
 
 class PoeditorSyncServiceProvider extends ServiceProvider
@@ -19,6 +21,8 @@ class PoeditorSyncServiceProvider extends ServiceProvider
             $this->commands([
                 DownloadCommand::class,
                 UploadCommand::class,
+                ValidateTranslationsCommand::class,
+                CleanupCommand::class
             ]);
         }
     }
