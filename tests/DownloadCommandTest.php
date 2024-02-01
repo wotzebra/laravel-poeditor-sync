@@ -352,6 +352,7 @@ class DownloadCommandTest extends TestCase
                 'foo' => '',
                 'bar' => 'baz',
             ],
+            'foo bar' => '',
         ]);
 
         $this->artisan('poeditor:download')->assertExitCode(0);
