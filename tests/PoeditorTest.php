@@ -12,7 +12,7 @@ use NextApps\PoeditorSync\Poeditor\UploadResponse;
 class PoeditorTest extends TestCase
 {
     /** @test */
-    public function it_requests_export_url_and_downloads_it_content()
+    public function it_requests_export_url_and_downloads_its_content()
     {
         Http::fake([
             'https://api.poeditor.com/v2/projects/export' => Http::response([
@@ -45,6 +45,40 @@ class PoeditorTest extends TestCase
                     'type' => 'key_value_json',
                 ];
         });
+    }
+
+    /** @test */
+    public function it_downloads_its_content_and_filters_empty_strings_out()
+    {
+        Http::fake([
+            'https://api.poeditor.com/v2/projects/export' => Http::response([
+                'response' => [
+                    'status' => 'success',
+                    'code' => 200,
+                    'message' => 'OK',
+                ],
+                'result' => [
+                    'url' => $exportUrl = $this->faker->url(),
+                ],
+            ]),
+            $exportUrl => Http::response([
+                'foo' => 'bar',
+                'empty' => '',
+                'nested' => [
+                    'empty' => [
+                        'value' => '',
+                    ],
+                    'not_empty' => [
+                        'bar' => 'baz',
+                        'empty' => '',
+                    ],
+                ],
+            ]),
+        ]);
+
+        $translations = app(Poeditor::class)->download($this->faker->locale());
+
+        $this->assertEquals(['foo' => 'bar', 'nested' => ['not_empty' => ['bar' => 'baz']]], $translations);
     }
 
     /** @test */

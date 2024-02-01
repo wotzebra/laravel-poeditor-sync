@@ -336,6 +336,31 @@ class DownloadCommandTest extends TestCase
     }
 
     /** @test */
+    public function it_removes_empty_translations()
+    {
+        config()->set('poeditor-sync.locales', ['en', 'fr']);
+
+        $this->mockPoeditorDownload('en', [
+            'php-file' => [
+                'foo' => 'bar',
+                'bar' => '',
+            ],
+        ]);
+
+        $this->mockPoeditorDownload('fr', [
+            'php-file' => [
+                'foo' => '',
+                'bar' => 'baz',
+            ],
+        ]);
+
+        $this->artisan('poeditor:download')->assertExitCode(0);
+
+        $this->assertPhpTranslationFile(lang_path('en/php-file.php'), ['foo' => 'bar']);
+        $this->assertPhpTranslationFile(lang_path('fr/php-file.php'), ['bar' => 'baz']);
+    }
+
+    /** @test */
     public function it_maps_poeditor_locales_on_multiple_internal_locales()
     {
         config()->set('app.fallback_locale', 'en_GB');
