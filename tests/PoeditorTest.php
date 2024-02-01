@@ -62,24 +62,34 @@ class PoeditorTest extends TestCase
                 ],
             ]),
             $exportUrl => Http::response([
-                'foo' => 'bar',
+                'key' => 'value',
                 'empty' => '',
                 'nested' => [
                     'empty' => [
-                        'value' => '',
-                    ],
-                    'not_empty' => [
-                        'bar' => 'baz',
-                        'empty' => '',
-                    ],
-                ],
+                        'value' => ''
+                    ]
+                ]
             ]),
         ]);
 
-        $translations = app(Poeditor::class)->download($this->faker->locale());
+        $translations = app(Poeditor::class)->download($locale = $this->faker->locale());
 
-        $this->assertEquals(['foo' => 'bar', 'nested' => ['not_empty' => ['bar' => 'baz']]], $translations);
+        $this->assertEquals(['key' => 'value'], $translations);
+
+        Http::assertSent(function (Request $request) use ($locale) {
+            return $request->url() === 'https://api.poeditor.com/v2/projects/export'
+                && $request->method() === 'POST'
+                && $request->isForm()
+                && $request->data() === [
+                    'api_token' => config('poeditor-sync.api_key'),
+                    'id' => config('poeditor-sync.project_id'),
+                    'language' => $locale,
+                    'type' => 'key_value_json',
+                ];
+        });
     }
+
+
 
     /** @test */
     public function it_throws_an_error_if_api_key_is_empty()
