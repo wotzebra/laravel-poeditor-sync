@@ -36,20 +36,6 @@ class TranslationManager
         }
     }
 
-    public function checkTranslations(Collection $translations, string $locale) : bool
-    {
-        $localeTranslations = collect($this->getTranslations($locale));
-
-        $missingKeys = $translations->dot()->diffAssoc($localeTranslations->dot());
-        $extraKeys = $localeTranslations->dot()->diffAssoc($translations->dot());
-
-        if ($missingKeys->isNotEmpty() || $extraKeys->isNotEmpty()) {
-            return false;
-        }
-
-        return true;
-    }
-
     protected function getVendorTranslations(string $locale) : Collection
     {
         if (! $this->filesystem->exists(lang_path('vendor'))) {
