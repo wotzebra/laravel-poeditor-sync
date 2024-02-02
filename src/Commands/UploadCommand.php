@@ -28,7 +28,8 @@ class UploadCommand extends Command
         $response = app(Poeditor::class)->upload(
             $this->getPoeditorLocale(),
             $translations,
-            $this->hasOption('force') && $this->option('force')
+            $this->hasOption('force') && $this->option('force'),
+            false
         );
 
         $this->info('All translations have been uploaded:');
@@ -37,6 +38,25 @@ class UploadCommand extends Command
         $this->line("{$response->getDeletedTermsCount()} terms deleted");
         $this->line("{$response->getAddedTranslationsCount()} translations added");
         $this->line("{$response->getUpdatedTranslationsCount()} translations updated");
+
+        $diff = collect(app(Poeditor::class)->download($this->getPoeditorLocale()))->dot()
+            ->diff(collect($translations)->dot());
+
+        if ($diff->isEmpty()) {
+            $this->info('The translations match the ones on POEditor');
+        } else {
+            $this->error('The following translations do not match the ones on POEditor:');
+
+            $this->table(['Key', 'Value'], $diff->map(function ($value, $key) {
+                return [$key, $value];
+            }));
+
+            if ($this->ask('Do you want to clean up the translations on POEditor? (y/n)')) {
+                $response = app(Poeditor::class)->upload($this->getPoeditorLocale(), $translations, true, true);
+
+                $this->info("Deleted {$response->getDeletedTermsCount()} terms");
+            }
+        }
 
         return COMMAND::SUCCESS;
     }
