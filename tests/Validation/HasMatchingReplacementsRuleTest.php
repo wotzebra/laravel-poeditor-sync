@@ -59,6 +59,20 @@ class HasMatchingReplacementsRuleTest extends TestCase
     }
 
     /** @test */
+    public function it_passes_if_replacements_match_in_different_order()
+    {
+        $validator = $this->getValidator([
+            'some_translation_key' => [
+                'en' => 'Some :foo translation :bar in English',
+                'nl' => 'Some :bar translation :foo in Dutch',
+                'fr' => 'Some :foo translation :bar in French',
+            ],
+        ]);
+
+        $this->assertTrue($validator->passes());
+    }
+
+    /** @test */
     public function it_passes_if_replacements_match_even_if_replacements_are_present_multiple_times()
     {
         $validator = $this->getValidator([

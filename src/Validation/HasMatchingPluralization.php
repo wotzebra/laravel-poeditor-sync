@@ -29,7 +29,7 @@ class HasMatchingPluralization implements ValidationRule
 
     protected function getPluralizationParts(string $text) : Collection
     {
-        preg_match_all('/({\d*}*)|(\|)|(\[\d*,(?:\d+|\**)\])/', $text, $matches);
+        preg_match_all('/(?:(?:^|\|)[\{\[]([^\[\]\{\}]*)[\}\]]|\|)/', $text, $matches);
 
         return collect($matches[0]);
     }
