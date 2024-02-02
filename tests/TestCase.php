@@ -5,6 +5,7 @@ namespace NextApps\PoeditorSync\Tests;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Str;
+use NextApps\PoeditorSync\Poeditor\Poeditor;
 use NextApps\PoeditorSync\PoeditorSyncServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Symfony\Component\VarExporter\VarExporter;
@@ -73,5 +74,14 @@ class TestCase extends BaseTestCase
 
         $this->assertTrue(file_exists($filename));
         $this->assertEquals(json_encode($data, JSON_PRETTY_PRINT), file_get_contents($filename));
+    }
+
+    public function mockPoeditorDownload(string $language, array $data) : void
+    {
+        if (get_class(app(Poeditor::class)) === Poeditor::class) {
+            $this->mock(Poeditor::class);
+        }
+
+        app(Poeditor::class)->shouldReceive('download')->with($language)->andReturn($data);
     }
 }
