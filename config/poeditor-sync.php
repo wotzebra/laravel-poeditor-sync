@@ -57,4 +57,16 @@ return [
     |
     */
     'excluded_files' => [],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Validate After Download
+    |--------------------------------------------------------------------------
+    |
+    | When the translations have been downloaded from POEditor, you can enable
+    | to automatically validate the translations and to check if they contain
+    | the correct replacements and the correct pluralization setup.
+    |
+    */
+    'validate_after_download' => true,
 ];

@@ -353,6 +353,7 @@ class DownloadCommandTest extends TestCase
     /** @test */
     public function it_maps_poeditor_locales_on_multiple_internal_locales()
     {
+        config()->set('app.fallback_locale', 'en_GB');
         config()->set('poeditor-sync.locales', ['en' => 'en_GB', 'nl' => ['nl_BE', 'nl_NL']]);
 
         $this->mockPoeditorDownload('en', [
@@ -377,6 +378,26 @@ class DownloadCommandTest extends TestCase
         $this->assertJsonTranslationFile(lang_path('nl_BE.json'), ['bar foo' => 'foo bar']);
         $this->assertPhpTranslationFile(lang_path('nl_NL/nl-php-file.php'), ['bar' => 'foo']);
         $this->assertJsonTranslationFile(lang_path('nl_NL.json'), ['bar foo' => 'foo bar']);
+    }
+
+    /** @test */
+    public function it_automatically_runs_validate_command_after_download_if_configured()
+    {
+        $this->mockPoeditorDownload('en', ['foo' => 'bar']);
+
+        config()->set('poeditor-sync.validate_after_download', false);
+
+        $this->artisan('poeditor:download')
+            ->expectsOutput('All translations have been downloaded!')
+            ->doesntExpectOutput('All translations are valid!')
+            ->assertExitCode(0);
+
+        config()->set('poeditor-sync.validate_after_download', true);
+
+        $this->artisan('poeditor:download')
+            ->expectsOutput('All translations have been downloaded!')
+            ->expectsOutput('All translations are valid!')
+            ->assertExitCode(0);
     }
 
     /**
