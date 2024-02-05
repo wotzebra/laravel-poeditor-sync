@@ -3,7 +3,6 @@
 namespace NextApps\PoeditorSync\Tests;
 
 use Illuminate\Filesystem\Filesystem;
-use Symfony\Component\VarExporter\VarExporter;
 
 class ValidateCommandTest extends TestCase
 {
@@ -55,21 +54,5 @@ class ValidateCommandTest extends TestCase
         $this->artisan('poeditor:validate')
             ->expectsOutput('All translations are valid!')
             ->assertExitCode(0);
-    }
-
-    public function createPhpTranslationFile(string $filename, array $data) : void
-    {
-        $filename = lang_path($filename);
-
-        app(Filesystem::class)->ensureDirectoryExists(dirname($filename), 0755, true);
-        app(Filesystem::class)->put($filename, '<?php' . PHP_EOL . PHP_EOL . 'return ' . VarExporter::export($data) . ';' . PHP_EOL);
-    }
-
-    public function createJsonTranslationFile(string $filename, array $data) : void
-    {
-        $filename = lang_path($filename);
-
-        app(Filesystem::class)->ensureDirectoryExists(dirname($filename), 0755, true);
-        app(Filesystem::class)->put($filename, json_encode($data, JSON_PRETTY_PRINT));
     }
 }
