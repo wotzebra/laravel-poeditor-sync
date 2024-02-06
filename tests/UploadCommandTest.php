@@ -208,7 +208,7 @@ class UploadCommandTest extends TestCase
     }
 
     /** @test */
-    public function it_asks_for_confirmation_when_translations_do_not_match_with_cleanup_enabled()
+    public function it_asks_for_confirmation_when_local_translations_keys_do_not_match_translations_keys_in_poeditor()
     {
         $this->createPhpTranslationFile('en/php-file.php', ['bar' => 'foo']);
 
@@ -229,23 +229,18 @@ class UploadCommandTest extends TestCase
             'php-file' => [
                 'bar' => 'foo',
             ],
-        ], true, true, new UploadResponse([
-            'result' => [
-                'terms' => ['added' => $this->faker->randomNumber(), 'deleted' => 1],
-                'translations' => ['added' => $this->faker->randomNumber(), 'updated' => $this->faker->randomNumber()],
-            ],
-        ]));
+        ], false, true, $response = $this->getPoeditorUploadResponse());
 
         $this->artisan('poeditor:upload')
-            ->expectsOutput('The following translations do not match the ones on POEditor:')
-            ->expectsQuestion('Do you want to clean up the translations on POEditor? (y/n)', 'y')
+            ->expectsOutput('The following translation keys do not exist locally but do exist in POEditor:')
             ->expectsTable(
-                ['Key', 'Value'],
+                ['Translation Key'],
                 [
-                    ['php-file.baz', 'bar'],
+                    ['php-file.baz'],
                 ]
             )
-            ->expectsOutput('Deleted ' . 1 . ' terms')
+            ->expectsQuestion('Do you want to delete those translation keys in POEditor? (y/n)', 'y')
+            ->expectsOutput("{$response->getDeletedTermsCount()} terms deleted")
             ->assertExitCode(0);
     }
 
@@ -361,37 +356,6 @@ class UploadCommandTest extends TestCase
         $this->artisan('poeditor:upload nl_NL')->assertExitCode(0);
 
         $this->artisan('poeditor:upload nl_BE')->assertExitCode(0);
-    }
-
-    /** @test */
-    public function it_checks_the_local_translation_keys_with_the_downloaded_keys()
-    {
-        $this->createPhpTranslationFile('en/first-en-php-file.php', ['foo' => 'bar']);
-        $this->createPhpTranslationFile('en/second-en-php-file.php', ['bar' => 'foo']);
-
-        $this->createPhpTranslationFile('nl/nl-php-file.php', ['foo_bar' => 'bar foo']);
-
-        $this->mockPoeditorUpload('en', [
-            'first-en-php-file' => [
-                'foo' => 'bar',
-            ],
-            'second-en-php-file' => [
-                'bar' => 'foo',
-            ],
-        ]);
-
-        $this->mockPoeditorDownload('en', [
-            'first-en-php-file' => [
-                'foo' => 'bar',
-            ],
-            'second-en-php-file' => [
-                'bar' => 'foo',
-            ],
-        ]);
-
-        $this->artisan('poeditor:upload')
-            ->expectsOutput('The translations match the ones on POEditor')
-            ->assertExitCode(0);
     }
 
     /** @test */

@@ -24,12 +24,30 @@ class UploadCommand extends Command
         }
 
         $translations = app(TranslationManager::class)->getTranslations($this->getLocale());
+        $cleanup = false;
+
+        collect(app(Poeditor::class)->download($this->getPoeditorLocale()))
+            ->dot()
+            ->keys()
+            ->diff(collect($translations)->dot()->keys())
+            ->whenNotEmpty(function ($locallyDeletedTranslationsKeys) use (&$cleanup) {
+                $this->error('The following translation keys do not exist locally but do exist in POEditor:');
+
+                $this->table(
+                    ['Translation Key'],
+                    $locallyDeletedTranslationsKeys->map(fn ($key) => [$key])->all()
+                );
+
+                if ($this->confirm('Do you want to delete those translation keys in POEditor? (y/n)')) {
+                    $cleanup = true;
+                }
+            });
 
         $response = app(Poeditor::class)->upload(
             $this->getPoeditorLocale(),
             $translations,
             $this->hasOption('force') && $this->option('force'),
-            false
+            $cleanup
         );
 
         $this->info('All translations have been uploaded:');
@@ -38,25 +56,6 @@ class UploadCommand extends Command
         $this->line("{$response->getDeletedTermsCount()} terms deleted");
         $this->line("{$response->getAddedTranslationsCount()} translations added");
         $this->line("{$response->getUpdatedTranslationsCount()} translations updated");
-
-        $diff = collect(app(Poeditor::class)->download($this->getPoeditorLocale()))->dot()
-            ->diff(collect($translations)->dot());
-
-        if ($diff->isEmpty()) {
-            $this->info('The translations match the ones on POEditor');
-        } else {
-            $this->error('The following translations do not match the ones on POEditor:');
-
-            $this->table(['Key', 'Value'], $diff->map(function ($value, $key) {
-                return [$key, $value];
-            }));
-
-            if ($this->ask('Do you want to clean up the translations on POEditor? (y/n)')) {
-                $response = app(Poeditor::class)->upload($this->getPoeditorLocale(), $translations, true, true);
-
-                $this->info("Deleted {$response->getDeletedTermsCount()} terms");
-            }
-        }
 
         return COMMAND::SUCCESS;
     }
