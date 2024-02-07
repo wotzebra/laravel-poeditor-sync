@@ -25,7 +25,7 @@ class Poeditor
             'type' => 'key_value_json',
         ])->json('result.url');
 
-        return Http::get($exportUrl)->json();
+        return collect(Http::get($exportUrl)->json())->dot()->filter()->undot()->toArray();
     }
 
     public function upload(string $language, array $translations, bool $overwrite = false) : UploadResponse
