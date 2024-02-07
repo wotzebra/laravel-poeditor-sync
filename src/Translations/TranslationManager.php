@@ -56,6 +56,10 @@ class TranslationManager
 
     protected function getPhpTranslations(string $folder) : Collection
     {
+        if (! $this->filesystem->exists($folder)) {
+            return collect();
+        }
+
         return collect($this->filesystem->files($folder))
             ->reject(fn ($file) => $this->getExcludedFilenames()->contains($file->getFilename()))
             ->mapWithKeys(function ($file) {

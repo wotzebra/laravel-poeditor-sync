@@ -4,6 +4,7 @@ namespace NextApps\PoeditorSync;
 
 use Illuminate\Support\ServiceProvider;
 use NextApps\PoeditorSync\Commands\DownloadCommand;
+use NextApps\PoeditorSync\Commands\StatusCommand;
 use NextApps\PoeditorSync\Commands\UploadCommand;
 use NextApps\PoeditorSync\Commands\ValidateCommand;
 use NextApps\PoeditorSync\Poeditor\Poeditor;
@@ -21,6 +22,7 @@ class PoeditorSyncServiceProvider extends ServiceProvider
                 DownloadCommand::class,
                 UploadCommand::class,
                 ValidateCommand::class,
+                StatusCommand::class,
             ]);
         }
     }
