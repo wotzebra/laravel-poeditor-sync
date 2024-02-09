@@ -21,11 +21,28 @@ class StatusCommand extends Command
             return collect($locale)->map(function ($internalLocale) use ($poeditorTranslations) {
                 $localTranslations = app(TranslationManager::class)->getTranslations($internalLocale);
 
-                if ($poeditorTranslations === $localTranslations) {
+                $poeditorTranslations = collect($poeditorTranslations)->dot()->sort();
+                $localTranslations = collect($localTranslations)->dot()->sort();
+
+                if ($poeditorTranslations->toArray() === $localTranslations->toArray()) {
                     return true;
                 }
 
                 $this->error("The translations for '{$internalLocale}' do not match the ones on POEditor.");
+
+                $missingLocally = $poeditorTranslations->diff($localTranslations);
+                $missingOnPoeditor = $localTranslations->diff($poeditorTranslations);
+
+                $this->table(
+                    ['Translation Key', 'Locale'],
+                    $missingLocally->merge($missingOnPoeditor)
+                        ->map(function ($value, $key) use ($internalLocale) {
+                            return [
+                                $key,
+                                $internalLocale,
+                            ];
+                        })->all()
+                );
 
                 return false;
             });
