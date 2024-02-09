@@ -24,11 +24,26 @@ class UploadCommand extends Command
         }
 
         $translations = app(TranslationManager::class)->getTranslations($this->getLocale());
+        $cleanup = collect(app(Poeditor::class)->download($this->getPoeditorLocale()))
+            ->dot()
+            ->keys()
+            ->diff(collect($translations)->dot()->keys())
+            ->whenNotEmpty(function ($locallyDeletedTranslationsKeys) use (&$cleanup) {
+                $this->error('The following translation keys do not exist locally but do exist in POEditor:');
+
+                $this->table(
+                    ['Translation Key'],
+                    $locallyDeletedTranslationsKeys->map(fn ($key) => [$key])->all()
+                );
+
+                return $this->confirm('Do you want to delete those translation keys in POEditor? (y/n)');
+            }, fn () => false);
 
         $response = app(Poeditor::class)->upload(
             $this->getPoeditorLocale(),
             $translations,
-            $this->hasOption('force') && $this->option('force')
+            $this->hasOption('force') && $this->option('force'),
+            $cleanup
         );
 
         $this->info('All translations have been uploaded:');

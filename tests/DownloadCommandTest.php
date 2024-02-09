@@ -3,7 +3,6 @@
 namespace NextApps\PoeditorSync\Tests;
 
 use Illuminate\Filesystem\Filesystem;
-use NextApps\PoeditorSync\Poeditor\Poeditor;
 
 class DownloadCommandTest extends TestCase
 {
@@ -383,14 +382,5 @@ class DownloadCommandTest extends TestCase
             ->expectsOutput('All translations have been downloaded!')
             ->expectsOutput('All translations are valid!')
             ->assertExitCode(0);
-    }
-
-    public function mockPoeditorDownload(string $language, array $data) : void
-    {
-        if (get_class(app(Poeditor::class)) === Poeditor::class) {
-            $this->mock(Poeditor::class);
-        }
-
-        app(Poeditor::class)->shouldReceive('download')->with($language)->andReturn($data);
     }
 }

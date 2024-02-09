@@ -158,6 +158,10 @@ class PoeditorTest extends TestCase
                         'contents' => 0,
                     ],
                     [
+                        'name' => 'sync_terms',
+                        'contents' => 0,
+                    ],
+                    [
                         'name' => 'fuzzy_trigger',
                         'contents' => 1,
                     ],
@@ -203,11 +207,7 @@ class PoeditorTest extends TestCase
                 ]),
         ]);
 
-        if (class_exists(Sleep::class)) {
-            Sleep::fake();
-        } else {
-            $startTime = time();
-        }
+        Sleep::fake();
 
         $response = app(Poeditor::class)->upload($this->faker->locale(), ['key' => 'value']);
 
@@ -215,11 +215,7 @@ class PoeditorTest extends TestCase
 
         Http::assertSentCount(2);
 
-        if (class_exists(Sleep::class)) {
-            Sleep::assertSleptTimes(1);
-            Sleep::assertSequence([Sleep::for(10)->seconds()]);
-        } else {
-            $this->assertTrue(time() - $startTime > 9);
-        }
+        Sleep::assertSleptTimes(1);
+        Sleep::assertSequence([Sleep::for(10)->seconds()]);
     }
 }
