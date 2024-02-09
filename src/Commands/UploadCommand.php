@@ -24,9 +24,7 @@ class UploadCommand extends Command
         }
 
         $translations = app(TranslationManager::class)->getTranslations($this->getLocale());
-        $cleanup = false;
-
-        collect(app(Poeditor::class)->download($this->getPoeditorLocale()))
+        $cleanup = collect(app(Poeditor::class)->download($this->getPoeditorLocale()))
             ->dot()
             ->keys()
             ->diff(collect($translations)->dot()->keys())
@@ -38,10 +36,8 @@ class UploadCommand extends Command
                     $locallyDeletedTranslationsKeys->map(fn ($key) => [$key])->all()
                 );
 
-                if ($this->confirm('Do you want to delete those translation keys in POEditor? (y/n)')) {
-                    $cleanup = true;
-                }
-            });
+                return $this->confirm('Do you want to delete those translation keys in POEditor? (y/n)');
+            }, fn () => false);
 
         $response = app(Poeditor::class)->upload(
             $this->getPoeditorLocale(),

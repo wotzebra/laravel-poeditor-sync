@@ -212,12 +212,6 @@ class UploadCommandTest extends TestCase
     {
         $this->createPhpTranslationFile('en/php-file.php', ['bar' => 'foo']);
 
-        $this->mockPoeditorUpload('en', [
-            'php-file' => [
-                'bar' => 'foo',
-            ],
-        ]);
-
         $this->mockPoeditorDownload('en', [
             'php-file' => [
                 'bar' => 'foo',
