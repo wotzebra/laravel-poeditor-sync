@@ -30,18 +30,12 @@ class StatusCommand extends Command
 
                 $this->error("The translations for '{$internalLocale}' do not match the ones on POEditor.");
 
-                $missingLocally = $poeditorTranslations->diff($localTranslations);
-                $missingOnPoeditor = $localTranslations->diff($poeditorTranslations);
+                $outdatedLocalTranslations = $poeditorTranslations->diff($localTranslations);
+                $outdatedPoeditorTranslations = $localTranslations->diff($poeditorTranslations);
 
                 $this->table(
-                    ['Translation Key', 'Locale'],
-                    $missingLocally->merge($missingOnPoeditor)
-                        ->map(function ($value, $key) use ($internalLocale) {
-                            return [
-                                $key,
-                                $internalLocale,
-                            ];
-                        })->all()
+                    ['Translation Key'],
+                    $outdatedLocalTranslations->merge($outdatedPoeditorTranslations)->keys()->map(fn ($key) => [$key])->all()
                 );
 
                 return false;
