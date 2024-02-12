@@ -35,7 +35,10 @@ class StatusCommand extends Command
 
                 $this->table(
                     ['Translation Key'],
-                    $outdatedLocalTranslations->merge($outdatedPoeditorTranslations)->keys()->map(fn ($key) => [$key])->all()
+                    $outdatedLocalTranslations->merge($outdatedPoeditorTranslations)
+                        ->keys()
+                        ->map(fn ($key) => [$key])
+                        ->all()
                 );
 
                 return false;

@@ -63,7 +63,7 @@ class StatusCommandTest extends TestCase
     {
         config()->set('poeditor-sync.locales', ['en']);
 
-        $this->createPhpTranslationFile('en/php-file.php', ['foo' => 'bar','baz' => 'bar']);
+        $this->createPhpTranslationFile('en/php-file.php', ['foo' => 'bar', 'baz' => 'bar']);
 
         $this->mockPoeditorDownload('en', [
             'php-file' => [
