@@ -21,8 +21,8 @@ class StatusCommand extends Command
             return collect($locale)->map(function ($internalLocale) use ($poeditorTranslations) {
                 $localTranslations = app(TranslationManager::class)->getTranslations($internalLocale);
 
-                $poeditorTranslations = collect($poeditorTranslations)->dot()->sort();
-                $localTranslations = collect($localTranslations)->dot()->sort();
+                $poeditorTranslations = collect($poeditorTranslations)->dot()->sortKeys();
+                $localTranslations = collect($localTranslations)->dot()->sortKeys();
 
                 if ($poeditorTranslations->toArray() === $localTranslations->toArray()) {
                     return true;
@@ -37,6 +37,7 @@ class StatusCommand extends Command
                     ['Translation Key'],
                     $outdatedLocalTranslations->merge($outdatedPoeditorTranslations)
                         ->keys()
+                        ->unique()
                         ->map(fn ($key) => [$key])
                         ->all()
                 );

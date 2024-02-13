@@ -67,15 +67,16 @@ class StatusCommandTest extends TestCase
 
         $this->mockPoeditorDownload('en', [
             'php-file' => [
-                'bar' => 'baz',
+                'baz' => 'bar',
                 'foo' => 'bar',
             ],
         ]);
 
         $this->artisan('poeditor:status')
-            ->expectsOutput('The translations for \'en\' do not match the ones on POEditor.')
+            ->expectsOutput('All translations match the ones on POEditor!')
+            ->doesntExpectOutput('The translations for \'en\' do not match the ones on POEditor.')
             ->doesntExpectOutput('The translations for \'nl\' do not match the ones on POEditor.')
-            ->assertExitCode(1);
+            ->assertExitCode(0);
     }
 
     /** @test */
@@ -100,5 +101,12 @@ class StatusCommandTest extends TestCase
                 ['php-file.nested.value'],
             ])
             ->assertExitCode(1);
+
+        $this->createPhpTranslationFile('en/php-file.php', ['foo' => 'bar', 'nested' => ['value' => 'nested values']]);
+
+        $this->artisan('poeditor:status')
+            ->expectsOutput('All translations match the ones on POEditor!')
+            ->doesntExpectOutput('The translations for \'en\' do not match the ones on POEditor.')
+            ->assertExitCode(0);
     }
 }
