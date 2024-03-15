@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-poeditor-sync` will be documented in this file
 
+## 1.0.1 - 2024-03-15
+
+- Added: Laravel 11 support ([#27](https://github.com/nextapps-be/laravel-poeditor-sync/pull/27))
+
 ## 1.0.0 - 2024-01-23
 
 - Changed: Modernize codebase ([#16](https://github.com/nextapps-be/laravel-poeditor-sync/pull/16))
