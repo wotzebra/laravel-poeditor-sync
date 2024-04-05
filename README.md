@@ -73,7 +73,23 @@ Upload translations and overwrite existing POEditor translations:
 php artisan poeditor:upload --force
 ```
 
-### Testing
+### Validate Translations
+
+Validate that translations have the same replacements and correct pluralization:
+
+```bash
+php artisan poeditor:validate
+```
+
+### Status of Translations
+
+Check if local translations match the ones on POEditor:
+
+```bash
+php artisan poeditor:status
+```
+
+## Testing
 
 ``` bash
 composer test
@@ -85,7 +101,7 @@ composer test
 composer lint
 ```
 
-### Changelog
+## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
 
