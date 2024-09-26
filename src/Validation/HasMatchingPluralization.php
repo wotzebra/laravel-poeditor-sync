@@ -1,6 +1,6 @@
 <?php
 
-namespace NextApps\PoeditorSync\Validation;
+namespace Wotz\PoeditorSync\Validation;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;

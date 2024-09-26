@@ -1,7 +1,7 @@
 # Laravel Poeditor Synchronization
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/nextapps/laravel-poeditor-sync.svg?style=flat-square)](https://packagist.org/packages/nextapps/laravel-poeditor-sync)
-[![Total Downloads](https://img.shields.io/packagist/dt/nextapps/laravel-poeditor-sync.svg?style=flat-square)](https://packagist.org/packages/nextapps/laravel-poeditor-sync)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/wotz/laravel-poeditor-sync.svg?style=flat-square)](https://packagist.org/packages/wotz/laravel-poeditor-sync)
+[![Total Downloads](https://img.shields.io/packagist/dt/wotz/laravel-poeditor-sync.svg?style=flat-square)](https://packagist.org/packages/wotz/laravel-poeditor-sync)
 
 Upload and download POEditor translations.
 Both PHP and JSON translation files are supported.
@@ -12,13 +12,13 @@ Vendor PHP / JSON translations can also be uploaded / downloaded.
 You can install the package via composer:
 
 ```bash
-composer require nextapps/laravel-poeditor-sync --dev
+composer require wotz/laravel-poeditor-sync --dev
 ```
 
 You can publish the configuration file:
 
 ```bash
-php artisan vendor:publish --provider="NextApps\PoeditorSync\PoeditorSyncServiceProvider"
+php artisan vendor:publish --provider="Wotz\PoeditorSync\PoeditorSyncServiceProvider"
 ```
 
 Set the POEditor API key and Project ID in your env-file:
@@ -111,7 +111,7 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 ## Credits
 
-- [Günther Debrauwer](https://github.com/nextapps)
+- [Günther Debrauwer](https://github.com/wotz)
 - [All Contributors](../../contributors)
 
 ## License

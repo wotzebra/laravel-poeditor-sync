@@ -1,18 +1,18 @@
 {
-    "name": "nextapps/laravel-poeditor-sync",
+    "name": "wotz/laravel-poeditor-sync",
     "description": "Upload and download POEditor translations",
     "keywords": [
-        "nextapps",
         "laravel",
-        "poeditor"
+        "poeditor",
+        "translations"
     ],
-    "homepage": "https://github.com/nextapps/laravel-poeditor-sync",
+    "homepage": "https://github.com/wotz/laravel-poeditor-sync",
     "license": "MIT",
     "type": "library",
     "authors": [
         {
             "name": "Günther Debrauwer",
-            "email": "gunther@nextapps.be",
+            "email": "gunther.debrauwer@whoownsthezebra.be",
             "role": "Developer"
         }
     ],
@@ -33,12 +33,12 @@
     },
     "autoload": {
         "psr-4": {
-            "NextApps\\PoeditorSync\\": "src"
+            "Wotz\\PoeditorSync\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "NextApps\\PoeditorSync\\Tests\\": "tests"
+            "Wotz\\PoeditorSync\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -53,7 +53,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "NextApps\\PoeditorSync\\PoeditorSyncServiceProvider"
+                "Wotz\\PoeditorSync\\PoeditorSyncServiceProvider"
             ]
         }
     }

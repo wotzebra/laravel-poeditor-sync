@@ -1,14 +1,14 @@
 <?php
 
-namespace NextApps\PoeditorSync\Tests;
+namespace Wotz\PoeditorSync\Tests;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Str;
-use NextApps\PoeditorSync\Poeditor\Poeditor;
-use NextApps\PoeditorSync\PoeditorSyncServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Symfony\Component\VarExporter\VarExporter;
+use Wotz\PoeditorSync\Poeditor\Poeditor;
+use Wotz\PoeditorSync\PoeditorSyncServiceProvider;
 
 class TestCase extends BaseTestCase
 {

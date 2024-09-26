@@ -1,10 +1,10 @@
 <?php
 
-namespace NextApps\PoeditorSync\Tests;
+namespace Wotz\PoeditorSync\Tests;
 
 use Illuminate\Filesystem\Filesystem;
-use NextApps\PoeditorSync\Poeditor\Poeditor;
-use NextApps\PoeditorSync\Poeditor\UploadResponse;
+use Wotz\PoeditorSync\Poeditor\Poeditor;
+use Wotz\PoeditorSync\Poeditor\UploadResponse;
 
 class UploadCommandTest extends TestCase
 {

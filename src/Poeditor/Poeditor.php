@@ -1,6 +1,6 @@
 <?php
 
-namespace NextApps\PoeditorSync\Poeditor;
+namespace Wotz\PoeditorSync\Poeditor;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Sleep;
