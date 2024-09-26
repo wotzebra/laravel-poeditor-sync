@@ -1,14 +1,14 @@
 <?php
 
-namespace NextApps\PoeditorSync\Commands;
+namespace Wotz\PoeditorSync\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
-use NextApps\PoeditorSync\Translations\TranslationManager;
-use NextApps\PoeditorSync\Validation\HasMatchingPluralization;
-use NextApps\PoeditorSync\Validation\HasMatchingReplacements;
+use Wotz\PoeditorSync\Translations\TranslationManager;
+use Wotz\PoeditorSync\Validation\HasMatchingPluralization;
+use Wotz\PoeditorSync\Validation\HasMatchingReplacements;
 
 class ValidateCommand extends Command
 {

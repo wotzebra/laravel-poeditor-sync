@@ -1,13 +1,13 @@
 <?php
 
-namespace NextApps\PoeditorSync;
+namespace Wotz\PoeditorSync;
 
 use Illuminate\Support\ServiceProvider;
-use NextApps\PoeditorSync\Commands\DownloadCommand;
-use NextApps\PoeditorSync\Commands\StatusCommand;
-use NextApps\PoeditorSync\Commands\UploadCommand;
-use NextApps\PoeditorSync\Commands\ValidateCommand;
-use NextApps\PoeditorSync\Poeditor\Poeditor;
+use Wotz\PoeditorSync\Commands\DownloadCommand;
+use Wotz\PoeditorSync\Commands\StatusCommand;
+use Wotz\PoeditorSync\Commands\UploadCommand;
+use Wotz\PoeditorSync\Commands\ValidateCommand;
+use Wotz\PoeditorSync\Poeditor\Poeditor;
 
 class PoeditorSyncServiceProvider extends ServiceProvider
 {

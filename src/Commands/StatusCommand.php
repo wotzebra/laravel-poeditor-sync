@@ -1,11 +1,11 @@
 <?php
 
-namespace NextApps\PoeditorSync\Commands;
+namespace Wotz\PoeditorSync\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use NextApps\PoeditorSync\Poeditor\Poeditor;
-use NextApps\PoeditorSync\Translations\TranslationManager;
+use Wotz\PoeditorSync\Poeditor\Poeditor;
+use Wotz\PoeditorSync\Translations\TranslationManager;
 
 class StatusCommand extends Command
 {

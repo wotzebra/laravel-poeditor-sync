@@ -1,6 +1,6 @@
 <?php
 
-namespace NextApps\PoeditorSync\Translations;
+namespace Wotz\PoeditorSync\Translations;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;

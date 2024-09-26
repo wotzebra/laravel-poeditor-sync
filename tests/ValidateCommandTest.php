@@ -1,6 +1,6 @@
 <?php
 
-namespace NextApps\PoeditorSync\Tests;
+namespace Wotz\PoeditorSync\Tests;
 
 use Illuminate\Filesystem\Filesystem;
 

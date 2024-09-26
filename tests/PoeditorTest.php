@@ -1,13 +1,13 @@
 <?php
 
-namespace NextApps\PoeditorSync\Tests;
+namespace Wotz\PoeditorSync\Tests;
 
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Sleep;
 use InvalidArgumentException;
-use NextApps\PoeditorSync\Poeditor\Poeditor;
-use NextApps\PoeditorSync\Poeditor\UploadResponse;
+use Wotz\PoeditorSync\Poeditor\Poeditor;
+use Wotz\PoeditorSync\Poeditor\UploadResponse;
 
 class PoeditorTest extends TestCase
 {

@@ -1,10 +1,10 @@
 <?php
 
-namespace NextApps\PoeditorSync\Tests\Validation;
+namespace Wotz\PoeditorSync\Tests\Validation;
 
 use Illuminate\Support\Facades\Validator;
-use NextApps\PoeditorSync\Tests\TestCase;
-use NextApps\PoeditorSync\Validation\HasMatchingPluralization;
+use Wotz\PoeditorSync\Tests\TestCase;
+use Wotz\PoeditorSync\Validation\HasMatchingPluralization;
 
 class HasMatchingPluralizationRuleTest extends TestCase
 {
