@@ -111,7 +111,7 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 ## Credits
 
-- [Günther Debrauwer](https://github.com/wotz)
+- [Günther Debrauwer](https://github.com/gdebrauwer)
 - [All Contributors](../../contributors)
 
 ## License

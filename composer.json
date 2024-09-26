@@ -6,7 +6,7 @@
         "poeditor",
         "translations"
     ],
-    "homepage": "https://github.com/wotz/laravel-poeditor-sync",
+    "homepage": "https://github.com/wotzebra/laravel-poeditor-sync",
     "license": "MIT",
     "type": "library",
     "authors": [
