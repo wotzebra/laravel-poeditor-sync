@@ -2,6 +2,18 @@
 
 All notable changes to `laravel-poeditor-sync` will be documented in this file
 
+## 3.0.0 - 2024-09-26
+
+- Changed: Namespace switch from 'NextApps' to 'Wotz' (https://github.com/wotzebra/laravel-poeditor-sync/pull/28)
+
+## 2.0.0 - 2024-04-05
+
+- Added: Command to validate translations (https://github.com/nextapps-be/laravel-poeditor-sync/pull/20)
+- Added: Command to check translation status (https://github.com/nextapps-be/laravel-poeditor-sync/pull/23, https://github.com/nextapps-be/laravel-poeditor-sync/pull/26)
+- Added: Run cleanup command after upload and ask to cleanup terms in poeditor (https://github.com/nextapps-be/laravel-poeditor-sync/pull/24)
+- Changed: Simplify tests by @gdebrauwer in (https://github.com/nextapps-be/laravel-poeditor-sync/pull/21)
+- Changed: Remove empty translation strings on poeditor download (https://github.com/nextapps-be/laravel-poeditor-sync/pull/22)
+
 ## 1.0.1 - 2024-03-15
 
 - Added: Laravel 11 support ([#27](https://github.com/wotzebra/laravel-poeditor-sync/pull/27))
