@@ -69,4 +69,18 @@ return [
     |
     */
     'validate_after_download' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Ignored Translation Keys During Validation
+    |--------------------------------------------------------------------------
+    |
+    | Define translation keys that should be ignored when running the validate
+    | command. This can be useful when the replacements of a translation key
+    | can be different in each language, for example when the replacements
+    | are suffixed with letter that is different is every a language.
+    | (e.g. ':hourh' in English and ':houru' in Dutch)
+    |
+    */
+    'ignored_keys_during_validation' => [],
 ];

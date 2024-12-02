@@ -11,6 +11,10 @@ class HasMatchingReplacements implements ValidationRule
 {
     public function validate(string $translationKey, mixed $translations, Closure $fail) : void
     {
+        if (collect(config('poeditor-sync.ignored_keys_during_validation'))->contains($translationKey)) {
+            return;
+        }
+
         $expectedReplacements = $this->getReplacements($translations[$this->getFallbackLocale()]);
 
         collect($translations)
