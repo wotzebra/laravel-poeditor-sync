@@ -114,6 +114,27 @@ class HasMatchingPluralizationRuleTest extends TestCase
         $this->assertSame(['Invalid pluralization in locale \'nl\''], $validator->errors()->all());
     }
 
+    /** @test */
+    public function it_does_not_fail_even_if_pluralization_does_not_match_because_translation_key_should_be_ignored()
+    {
+        config()->set('poeditor-sync.ignored_keys_during_validation', ['some_translation_key']);
+
+        $validator = $this->getValidator([
+            'some_translation_key' => [
+                'en' => '{0} Some singular translation in English|[1, *] Some plural translation in English',
+                'nl' => '[1, *] Some plural translation in Dutch|{0} Some singular translation in Dutch',
+                'fr' => '{0} Some singular translation in French|[1, *] Some plural translation in French',
+            ],
+        ]);
+
+        $this->assertFalse($validator->fails());
+
+        config()->set('poeditor-sync.ignored_keys_during_validation', ['some_other_translation_key']);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame(['Invalid pluralization in locale \'nl\''], $validator->errors()->all());
+    }
+
     public function getValidator(array $data)
     {
         return Validator::make($data, [

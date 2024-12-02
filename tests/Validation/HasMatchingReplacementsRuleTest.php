@@ -119,6 +119,27 @@ class HasMatchingReplacementsRuleTest extends TestCase
         ], $validator->errors()->all());
     }
 
+    /** @test */
+    public function it_does_not_fail_even_if_replacements_do_not_match_because_translation_key_should_be_ignored()
+    {
+        config()->set('poeditor-sync.ignored_keys_during_validation', ['some_translation_key']);
+
+        $validator = $this->getValidator([
+            'some_translation_key' => [
+                'en' => 'Some translation :foo in English',
+                'nl' => 'Some translation in Dutch',
+                'fr' => 'Some translation :foo in French',
+            ],
+        ]);
+
+        $this->assertFalse($validator->fails());
+
+        config()->set('poeditor-sync.ignored_keys_during_validation', ['some_other_translation_key']);
+
+        $this->assertTrue($validator->fails());
+        $this->assertSame(['Missing replacement key \':foo\' in nl'], $validator->errors()->all());
+    }
+
     public function getValidator(array $data)
     {
         return Validator::make($data, [
