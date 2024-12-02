@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-poeditor-sync` will be documented in this file
 
+## 3.0.1 - 2024-12-02
+
+- Added: Allow ignoring certain translation keys when running validate command (https://github.com/wotzebra/laravel-poeditor-sync/pull/29)
+
 ## 3.0.0 - 2024-09-26
 
 - Changed: Namespace switch from 'NextApps' to 'Wotz' (https://github.com/wotzebra/laravel-poeditor-sync/pull/28)
