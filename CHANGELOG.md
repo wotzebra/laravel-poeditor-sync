@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-poeditor-sync` will be documented in this file
 
+## 3.1.0 - 2024-12-12
+
+- Added: PHP 8.4 support (https://github.com/wotzebra/laravel-poeditor-sync/pull/30)
+
 ## 3.0.1 - 2024-12-02
 
 - Added: Allow ignoring certain translation keys when running validate command (https://github.com/wotzebra/laravel-poeditor-sync/pull/29)
