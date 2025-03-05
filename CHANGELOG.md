@@ -2,6 +2,11 @@
 
 All notable changes to `laravel-poeditor-sync` will be documented in this file
 
+## 3.2.0 - 2025-03-05
+
+- Added: Laravel v12 support (https://github.com/wotzebra/laravel-poeditor-sync/pull/31)
+- Added: Support for dots in translations keys inside json files (https://github.com/wotzebra/laravel-poeditor-sync/pull/32)
+
 ## 3.1.0 - 2024-12-12
 
 - Added: PHP 8.4 support (https://github.com/wotzebra/laravel-poeditor-sync/pull/30)
