@@ -82,6 +82,37 @@ class PoeditorTest extends TestCase
     }
 
     /** @test */
+    public function it_returns_keys_with_dots_in_them_correctly()
+    {
+        Http::fake([
+            'https://api.poeditor.com/v2/projects/export' => Http::response([
+                'response' => [
+                    'status' => 'success',
+                    'code' => 200,
+                    'message' => 'OK',
+                ],
+                'result' => [
+                    'url' => $exportUrl = $this->faker->url(),
+                ],
+            ]),
+            $exportUrl => Http::response([
+                'foo' => 'bar',
+                'a key with a dot. inside it' => 'foo bar baz',
+                'a key with a dot at end of it.' => ' baz bar foo',
+                'nested' => [
+                    'bar' => [
+                        'baz' => 'baz value',
+                    ],
+                ],
+            ]),
+        ]);
+
+        $translations = app(Poeditor::class)->download($this->faker->locale());
+
+        $this->assertEquals(['foo' => 'bar', 'a key with a dot. inside it' => 'foo bar baz', 'a key with a dot at end of it.' => ' baz bar foo', 'nested' => ['bar' => ['baz' => 'baz value']]], $translations);
+    }
+
+    /** @test */
     public function it_throws_an_error_if_api_key_is_empty()
     {
         $this->expectException(InvalidArgumentException::class);

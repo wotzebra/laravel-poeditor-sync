@@ -4,6 +4,7 @@ namespace Wotz\PoeditorSync\Poeditor;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Sleep;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 class Poeditor
@@ -25,7 +26,17 @@ class Poeditor
             'type' => 'key_value_json',
         ])->json('result.url');
 
-        return collect(Http::get($exportUrl)->json())->dot()->filter()->undot()->toArray();
+        return collect(Http::get($exportUrl)->json())
+            ->mapWithKeys(function ($value, $key) {
+                return [(string) Str::of($key)->replace('.', '__ESCAPED_DOT__') => $value];
+            })
+            ->dot()
+            ->filter()
+            ->undot()
+            ->mapWithKeys(function ($value, $key) {
+                return [(string) Str::of($key)->replace('__ESCAPED_DOT__', '.') => $value];
+            })
+            ->toArray();
     }
 
     public function upload(
