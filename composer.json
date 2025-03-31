@@ -22,7 +22,7 @@
         "illuminate/filesystem": "^10.0|^11.0|^12.0",
         "illuminate/http": "^10.0|^11.0|^12.0",
         "illuminate/support": "^10.10|^11.0|^12.0",
-        "symfony/var-exporter": "^6.0"
+        "symfony/var-exporter": "^6.0|^7.0"
     },
     "require-dev": {
         "adamwojs/php-cs-fixer-phpdoc-force-fqcn": "^2.0",
