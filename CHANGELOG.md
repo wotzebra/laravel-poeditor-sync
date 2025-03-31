@@ -2,6 +2,10 @@
 
 All notable changes to `laravel-poeditor-sync` will be documented in this file
 
+## 3.2.1 - 2025-03-31
+
+- Added: Support for v7 of symfony/var-exporter (https://github.com/wotzebra/laravel-poeditor-sync/pull/34)
+
 ## 3.2.0 - 2025-03-05
 
 - Added: Laravel v12 support (https://github.com/wotzebra/laravel-poeditor-sync/pull/31)
