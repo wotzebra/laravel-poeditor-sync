@@ -167,41 +167,44 @@ class PoeditorTest extends TestCase
             return $request->url() === 'https://api.poeditor.com/v2/projects/upload'
                 && $request->method() === 'POST'
                 && $request->isMultipart()
-                && $request->data() === [
-                    [
-                        'name' => 'api_token',
-                        'contents' => config('poeditor-sync.api_key'),
-                    ],
-                    [
-                        'name' => 'id',
-                        'contents' => config('poeditor-sync.project_id'),
-                    ],
-                    [
-                        'name' => 'language',
-                        'contents' => $locale,
-                    ],
-                    [
-                        'name' => 'updating',
-                        'contents' => 'terms_translations',
-                    ],
-                    [
-                        'name' => 'overwrite',
-                        'contents' => 0,
-                    ],
-                    [
-                        'name' => 'sync_terms',
-                        'contents' => 0,
-                    ],
-                    [
-                        'name' => 'fuzzy_trigger',
-                        'contents' => 1,
-                    ],
-                    [
-                        'name' => 'file',
-                        'contents' => json_encode($translations),
-                        'filename' => 'translations.json',
-                    ],
-                ];
+                && collect($request->data())
+                    // Newer Laravel versions add an empty 'headers' key to multipart parts.
+                    ->map(fn (array $part) => array_filter($part, fn ($value, $key) => $key !== 'headers' || $value !== [], ARRAY_FILTER_USE_BOTH))
+                    ->all() === [
+                        [
+                            'name' => 'api_token',
+                            'contents' => config('poeditor-sync.api_key'),
+                        ],
+                        [
+                            'name' => 'id',
+                            'contents' => config('poeditor-sync.project_id'),
+                        ],
+                        [
+                            'name' => 'language',
+                            'contents' => $locale,
+                        ],
+                        [
+                            'name' => 'updating',
+                            'contents' => 'terms_translations',
+                        ],
+                        [
+                            'name' => 'overwrite',
+                            'contents' => 0,
+                        ],
+                        [
+                            'name' => 'sync_terms',
+                            'contents' => 0,
+                        ],
+                        [
+                            'name' => 'fuzzy_trigger',
+                            'contents' => 1,
+                        ],
+                        [
+                            'name' => 'file',
+                            'contents' => json_encode($translations),
+                            'filename' => 'translations.json',
+                        ],
+                    ];
         });
     }
 
