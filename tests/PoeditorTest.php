@@ -167,7 +167,10 @@ class PoeditorTest extends TestCase
             return $request->url() === 'https://api.poeditor.com/v2/projects/upload'
                 && $request->method() === 'POST'
                 && $request->isMultipart()
-                && $request->data() === [
+                && collect($request->data())
+                    // Newer Laravel versions add an empty 'headers' key to multipart parts.
+                    ->map(fn (array $part) => array_filter($part, fn ($value, $key) => $key !== 'headers' || $value !== [], ARRAY_FILTER_USE_BOTH))
+                    ->all() === [
                     [
                         'name' => 'api_token',
                         'contents' => config('poeditor-sync.api_key'),
